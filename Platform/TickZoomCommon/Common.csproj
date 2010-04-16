@@ -109,13 +109,14 @@
     <Compile Include="Optimization\OptimizerVar.cs" />
     <Compile Include="Performance\BaseStats.cs" />
     <Compile Include="Performance\Equity.cs" />
-    <Compile Include="Performance\EquityProfitLoss.cs" />
+    <Compile Include="Performance\ProfitLossEquity.cs" />
     <Compile Include="Performance\EquityStats.cs" />
     <Compile Include="Performance\EquityStatsReport.cs" />
     <Compile Include="Performance\IndexForReport.cs" />
     <Compile Include="Performance\Performance.cs" />
-    <Compile Include="Performance\ProfitLoss.cs" />
-    <Compile Include="Performance\TradeProfitLoss.cs" />
+    <Compile Include="Performance\ProfitLossCallback.cs" />
+    <Compile Include="Performance\ProfitLossMBT.cs" />
+    <Compile Include="Performance\ProfitLossIB.cs" />
     <Compile Include="Performance\ReportHelper.cs" />
     <Compile Include="Performance\RoundTurn.cs" />
     <Compile Include="Performance\RoundTurnBinary.cs" />

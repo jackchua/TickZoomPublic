@@ -89,7 +89,7 @@ namespace TickZoom.BrokerageFramework
 			pair.Direction = 0;
 			TransactionPairsBinary tradesBinary = new TransactionPairsBinary();
 			tradesBinary.Add(pair);
-			TransactionPairs trades = new TransactionPairs(null,new TradeProfitLoss(),tradesBinary);
+			TransactionPairs trades = new TransactionPairs(null,new ProfitLossCallback(),tradesBinary);
 			double pnl = trades.CalcProfitLoss(0);
 		}
 		
@@ -125,7 +125,7 @@ namespace TickZoom.BrokerageFramework
 			double ProfitLoss = (pair.ExitPrice - pair.EntryPrice) * 1;
 			TransactionPairsBinary tradesBinary = new TransactionPairsBinary();
 			tradesBinary.Add(pair);
-			TransactionPairs trades = new TransactionPairs(null,new TradeProfitLoss(),tradesBinary);
+			TransactionPairs trades = new TransactionPairs(null,new ProfitLossCallback(),tradesBinary);
 			Assert.AreEqual(11060,trades.CalcProfitLoss(0),"ProfitLoss");
 		}
 		

@@ -44,8 +44,6 @@ namespace TickZoom
 		public SimpleStrategy2()
 		{
 			ExitStrategy.ControlStrategy = false;
-			Performance.Slippage = 0;
-			Performance.Commission = 1;
 			IntervalDefault = Intervals.Range30;
 			RequestUpdate(Intervals.Second10);
 			RequestUpdate(Intervals.Day1);

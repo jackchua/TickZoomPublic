@@ -43,8 +43,9 @@ namespace TickZoom.TradingFramework
 		{
 			starter = new HistoricalStarter();
 			random = new RandomCommon();
-			random.Performance.Slippage = 0.0140;
-			random.Performance.Commission = 0.010;
+			ProfitLossDefault profitLossLogic = new ProfitLossDefault();
+			profitLossLogic.Slippage = 0.0140;
+			profitLossLogic.Commission = 0.010;
 //			if( trace) log.Trace("RandomTest engine.Formula.Chain="+starter.Model.Chain.ToString());
 			exits = random.ExitStrategy;
 			
@@ -54,6 +55,7 @@ namespace TickZoom.TradingFramework
 			starter.EndCount = maxCount;
 			starter.DataFolder = "TestData";
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY";
+			starter.ProjectProperties.Starter.SymbolProperties[0].ProfitLoss = profitLossLogic;
 			starter.Run(random);
 			
 			Constructor(random.Performance.ComboTrades);

@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -27,10 +27,16 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of Class1.
-	/// </summary>
-	public interface ProfitLoss {
-		double CalculateProfit( double position, double entry, double exit);
+	public class ProfitLossEquity : ProfitLoss {
+		private SymbolInfo symbol;
+		public double CalculateProfit( double position, double entry, double exit) {
+			double pnl = exit - entry;
+			return pnl.Round();
+		}
+		
+		public SymbolInfo Symbol {
+			get { return symbol; }
+			set { symbol = value; }
+		}
 	}
 }

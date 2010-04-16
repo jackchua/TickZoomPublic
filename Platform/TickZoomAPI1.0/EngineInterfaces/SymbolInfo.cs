@@ -130,7 +130,7 @@ namespace TickZoom.Api
 		}
  		
  		/// <summary>
- 		/// With which other symbols with this one get drawn on a chart? Returns
+ 		/// With which other symbols does this one get drawn on a chart? Returns
  		/// a group number where 0 means never draw this symbol on any chart.
  		/// All symbols with that same ChartGroup number will appear on the same
  		/// chart. You can only set this property inside your Loader before
@@ -203,6 +203,14 @@ namespace TickZoom.Api
  		/// enum for a list of possible symbol types.
  		/// </summary>
  		InstrumentType InstrumentType {
+ 			get;
+ 		}
+ 		
+ 		/// <summary>
+ 		/// Returns the ProfitLoss calculation for this symbols. It's used
+ 		/// primarily to correctly calculate transaction costs for trades.
+ 		/// </summary>
+ 		ProfitLoss ProfitLoss {
  			get;
  		}
 	}

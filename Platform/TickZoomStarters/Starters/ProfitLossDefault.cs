@@ -27,10 +27,36 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class EquityProfitLoss : ProfitLoss {
+
+	[Serializable]
+	public class ProfitLossDefault : ProfitLoss {
+		SymbolInfo symbol;
+		double slippage = 0D;
+		double commission = 0D;
+		
+		public ProfitLossDefault() {
+		}
+		
+		
 		public double CalculateProfit( double position, double entry, double exit) {
-			double pnl = exit - entry;
+			double transactionCosts = (slippage + commission)*1/*symbol.FullPointValue*/*Math.Abs(position);
+			double pnl = ((exit - entry) * position * 1/*symbol.FullPointValue*/) - transactionCosts;
 			return pnl.Round();
+		}
+		
+		public SymbolInfo Symbol {
+			get { return symbol; }
+			set { symbol = value; }
+		}
+		
+		public double Slippage {
+			get { return slippage; }
+			set { slippage = value; }
+		}
+		
+		public double Commission {
+			get { return commission; }
+			set { commission = value; }
 		}
 	}
 }

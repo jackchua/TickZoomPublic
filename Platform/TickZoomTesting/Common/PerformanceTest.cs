@@ -94,8 +94,9 @@ namespace TickZoom.Common
 			// Creation.
 			RandomCommon random = new RandomCommon();
 			PerformanceInner performance = new PerformanceInner(random);
-			performance.Slippage = 0.0140;
-			performance.Commission = 0.010;
+			ProfitLossDefault profitLossLogic = new ProfitLossDefault();
+			profitLossLogic.Slippage = 0.0140;
+			profitLossLogic.Commission = 0.010;
 			random.Performance = performance;
 			random.Performance.Equity.EnableMonthlyStats = true;
 			random.Performance.Equity.EnableWeeklyStats = true;
@@ -108,6 +109,7 @@ namespace TickZoom.Common
 			starter.StartCount = 0;
 			starter.EndCount = starter.StartCount + count + 1;
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY_YEARS";
+			starter.ProjectProperties.Starter.SymbolProperties[0].ProfitLoss = profitLossLogic;
 			starter.DataFolder = "TestData";
 			starter.Run(random);
 			

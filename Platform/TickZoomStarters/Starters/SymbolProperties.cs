@@ -60,6 +60,7 @@ namespace TickZoom.Common
 		private bool useSyntheticLimits = true;
 		private bool useSyntheticStops = true;
 		InstrumentType instrumentType = InstrumentType.None;
+		private ProfitLoss profitLoss = new ProfitLossDefault();
 		
 		public TimeAndSales TimeAndSales {
 			get { return timeAndSales; }
@@ -192,6 +193,11 @@ namespace TickZoom.Common
 		public InstrumentType InstrumentType {
 			get { return instrumentType; }
 			set { instrumentType = value; }
+		}
+		
+		public ProfitLoss ProfitLoss {
+			get { return profitLoss; }
+			set { profitLoss = value; }
 		}
 	}
 }

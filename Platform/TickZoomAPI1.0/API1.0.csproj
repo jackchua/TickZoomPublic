@@ -92,6 +92,7 @@
     <Compile Include="ClientInterfaces\OrderManager.cs" />
     <Compile Include="ClientInterfaces\PortfolioInterface.cs" />
     <Compile Include="ClientInterfaces\PositionInterface.cs" />
+    <Compile Include="ClientInterfaces\ProfitLoss.cs" />
     <Compile Include="ClientInterfaces\ResultInterface.cs" />
     <Compile Include="ClientInterfaces\ServiceConnection.cs" />
     <Compile Include="ClientInterfaces\StrategyInterface.cs" />

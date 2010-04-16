@@ -57,7 +57,7 @@ namespace TickZoom.Common
 		}
 	
 		private void WriteReport() {
-			EquityStats stats = new EquityStats(equity.Daily,equity.Weekly,equity.Monthly,equity.Yearly);
+			EquityStats stats = new EquityStats(equity.StartingEquity,equity.Daily,equity.Weekly,equity.Monthly,equity.Yearly);
 			WriteChart(folder,name,"DailyEquity",stats.Daily,equity.Daily);
 			fwriter.WriteLine("<HTML>");
 			fwriter.WriteLine("<HEAD>");

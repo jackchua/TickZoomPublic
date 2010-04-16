@@ -48,7 +48,7 @@ namespace TickZoom.Common
 		TransactionPairsBinary comboTradesBinary;
 		bool graphTrades = true;
 		Equity equity;
-		TradeProfitLoss tradeProfitLoss;
+		ProfitLoss profitLoss;
 		List<double> positionChanges = new List<double>();
 		PositionCommon position;
 		Model model;
@@ -56,7 +56,6 @@ namespace TickZoom.Common
 		public Performance(Model model)
 		{
 			this.model = model;
-			tradeProfitLoss = new TradeProfitLoss(model);
 			equity = new Equity(model,this);
 			comboTradesBinary  = new TransactionPairsBinary();
 			comboTradesBinary.Name = "ComboTrades";
@@ -96,8 +95,9 @@ namespace TickZoom.Common
 		
 		public void OnInitialize()
 		{ 
-			comboTrades  = new TransactionPairs(GetCurrentPrice,tradeProfitLoss,comboTradesBinary);
-			tradeProfitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
+			profitLoss = model.Data.SymbolInfo.ProfitLoss;
+			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
+			profitLoss.Symbol = model.Data.SymbolInfo;
 
 		}
 		
@@ -172,7 +172,7 @@ namespace TickZoom.Common
 			comboTrade.ExitBar = model.Chart.ChartBars.BarCount;
 			comboTrade.Completed = true;
 			comboTradesBinary.Tail = comboTrade;
-			double pnl = tradeProfitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
+			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
 			Equity.OnChangeClosedEquity( pnl);
 			if( tradeInfo) tradeLog.Info( model.Name + "," + Equity.ClosedEquity + "," + pnl + "," + comboTrade);
 			if( model is Strategy) {
@@ -241,20 +241,27 @@ namespace TickZoom.Common
 			index.WriteReport(name, folder);
 			return true;
 		}
-
+			
+		/// <summary>
+		/// Obsolete. Please use the ProfitLoss interface
+		/// </summary>
+		[Obsolete("Please use the ProfitLoss interface instead.",true)]
 		public double Slippage {
-			get { return tradeProfitLoss.Slippage; }
-			set { tradeProfitLoss.Slippage = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
-		
 		
 		public List<double> PositionChanges {
 			get { return positionChanges; }
 		}
 
+		/// <summary>
+		/// Obsolete. Please use the ProfitLoss interface instead.
+		/// </summary>
+		[Obsolete("Please use the ProfitLoss interface instead.",true)]
 		public double Commission {
-			get { return tradeProfitLoss.Commission; }
-			set { tradeProfitLoss.Commission = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException();  }
 		}
 		
 		public PositionCommon Position {
@@ -392,13 +399,6 @@ namespace TickZoom.Common
 			set { Equity.GraphEquity = value; }
 		}
 		
-		[Obsolete("Please use Slippage and Commission properties on Performance.",true)]
-		public ProfitLoss TradeProfitLoss {
-			get { return null; }
-			set { }
-		}
-
-
 #endregion		
 
 	}

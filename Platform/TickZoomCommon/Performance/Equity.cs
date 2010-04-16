@@ -61,7 +61,7 @@ namespace TickZoom.Common
 		{
 			this.model = model;
 			this.performance = performance;
-			equityProfitLoss = new EquityProfitLoss();
+			equityProfitLoss = new ProfitLossEquity();
 			dailyBinary = new TransactionPairsBinary();
 		}
 		

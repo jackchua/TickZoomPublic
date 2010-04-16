@@ -50,6 +50,7 @@
     <Compile Include="Starters\Chromosome.cs" />
     <Compile Include="Starters\ModelPropertiesCommon.cs" />
     <Compile Include="Starters\ModelPropertyCommon.cs" />
+    <Compile Include="Starters\ProfitLossDefault.cs" />
     <Compile Include="Starters\StarterFactoryImpl.cs" />
     <Compile Include="Starters\SymbolCategory.cs" />
     <Compile Include="Starters\SymbolDictionary.cs" />

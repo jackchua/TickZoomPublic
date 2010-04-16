@@ -27,18 +27,21 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class TradeProfitLoss : ProfitLoss {
+
+	
+	public class ProfitLossCallback : ProfitLoss {
 		double slippage = 0.0D;
 		double commission = 0.0D;
-		double fullPointValue = 1.0D;
+		double fullPointValue = 1D;
 		Model model;
 		bool firstTime = true;
 		bool userImplemented = false;
+		SymbolInfo symbol;
 		
-		public TradeProfitLoss() {
+		public ProfitLossCallback() {
 		}
 		
-		public TradeProfitLoss(Model model) {
+		public ProfitLossCallback(Model model) {
 			this.model = model;
 		}
 		
@@ -65,20 +68,10 @@ namespace TickZoom.Common
 				return pnl.Round();
 			}
 		}
-
-		public double Slippage {
-			get { return slippage; }
-			set { slippage = value; }
-		}
 		
-		public double Commission {
-			get { return commission; }
-			set { commission = value; }
-		}
-		
-		public double FullPointValue {
-			get { return fullPointValue; }
-			set { fullPointValue = value; }
+		public SymbolInfo Symbol {
+			get { return symbol; }
+			set { symbol = value; }
 		}
 	}
 }

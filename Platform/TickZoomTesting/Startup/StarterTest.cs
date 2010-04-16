@@ -99,11 +99,13 @@ namespace TickZoom.StarterTest
 		public void TestOptimize()
 		{
 			Starter starter = new OptimizeStarter();
+			ProfitLossCallback profitLossLogic = new ProfitLossCallback();
     		starter.ProjectProperties.Starter.StartTime = (TimeStamp) new DateTime(2005,1,1);
     		starter.ProjectProperties.Starter.EndTime = (TimeStamp) new DateTime(2006,2,1);
 			starter.ProjectProperties.Starter.IntervalDefault = Intervals.Hour1;
     		starter.DataFolder = "TestData";
     		starter.ProjectProperties.Starter.Symbols = "USD_JPY";
+    		starter.ProjectProperties.Starter.SymbolProperties[0].ProfitLoss = profitLossLogic;
     		starter.Run(new OptimizeLoader());
     		Assert.IsTrue(FileCompare(storageFolder+@"\Statistics\optimizeResults.csv",@"..\..\Platform\TickZoomTesting\Startup\optimizeResults.csv"));
 		}

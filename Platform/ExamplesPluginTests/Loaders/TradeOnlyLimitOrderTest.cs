@@ -43,7 +43,7 @@ namespace Loaders
 		ExampleOrderStrategy strategy;
 		public TradeOnlyLimitOrderTest() {
 			Symbols = "/ESH0TradeBar";
-			StoreKnownGood = false;
+			StoreKnownGood = true;
 			ShowCharts = false;
 		}
 			
@@ -78,15 +78,15 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( 10662.5,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( 10013.25,strategy.Performance.Equity.CurrentEquity,"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( 137.5,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( 2.75,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( 10525,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( 10010.50,strategy.Performance.Equity.ClosedEquity,"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {

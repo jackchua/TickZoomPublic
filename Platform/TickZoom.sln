@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-# SharpDevelop 3.1.0.4977
+# SharpDevelop 3.2.0.5505
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "TickZoomGui\GUI.csproj", "{2E2F67C6-8492-4034-A142-50872504D86D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "TickZoomCommon\Common.csproj", "{3272A53F-7A88-4A5B-BBCA-1C3A9EA2E21F}"
