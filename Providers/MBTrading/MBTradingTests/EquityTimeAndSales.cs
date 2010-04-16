@@ -52,8 +52,8 @@ namespace TickZoom.Test
 		public virtual void Init()
 		{
 			string appData = Factory.Settings["AppDataFolder"];
-			File.Delete( appData + @"\Logs\MBTradingTests.log");
-			File.Delete( appData + @"\Logs\MBTradingService.log");
+			File.Delete( Factory.Log.LogFolder + @"\MBTradingTests.log");
+			File.Delete( Factory.Log.LogFolder + @"\MBTradingService.log");
   			symbol = Factory.Symbol.LookupSymbol("CSCO");
 		}
 		
@@ -104,7 +104,7 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===StopSymbol===");
 			provider.SendEvent(verify,symbol,(int)EventType.StopSymbol,null);
   			count = verify.Verify(AssertTick,symbol,10);
-  			Assert.AreEqual(count,0,"tick count");
+  			Assert.AreEqual(0,count,"tick count");
 		}
 
 		[Test]

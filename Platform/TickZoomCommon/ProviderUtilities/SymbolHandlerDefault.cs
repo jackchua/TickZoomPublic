@@ -96,7 +96,7 @@ namespace TickZoom.Common
 		}
         
 		public void SendTimeAndSales() {
-			if( symbol.TimeAndSales != TimeAndSales.ActualTrades ) {
+			if( !isRunning || symbol.TimeAndSales != TimeAndSales.ActualTrades ) {
 				return;
 			}
 			if( !isTradeInitialized ) {

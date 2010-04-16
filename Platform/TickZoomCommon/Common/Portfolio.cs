@@ -104,8 +104,14 @@ namespace TickZoom.Common
 						List<Model> tempStrategies = kvp.Value;
 						if( tempStrategies.Count > 1) {
 							Portfolio portfolio = new Portfolio();
-							portfolio.Name = "Portfolio-"+symbol;
+							portfolio.Name = "AutoGen-Portfolio-"+symbol;
 							portfolio.SymbolDefault = symbol;
+							portfolio.IntervalDefault = IntervalDefault;
+							portfolio.Performance.Equity.EnableDailyStats = Performance.Equity.EnableDailyStats;
+							portfolio.Performance.Equity.EnableWeeklyStats = Performance.Equity.EnableWeeklyStats;
+							portfolio.Performance.Equity.EnableMonthlyStats = Performance.Equity.EnableMonthlyStats;
+							portfolio.Performance.Equity.EnableYearlyStats = Performance.Equity.EnableYearlyStats;
+							
 							foreach( var strategy in tempStrategies) {
 								portfolio.Chain.Dependencies.Add(strategy.Chain);
 							}

@@ -47,8 +47,8 @@ namespace TickZoom.Test
 		public virtual void Init()
 		{
 			string appData = Factory.Settings["AppDataFolder"];
-			File.Delete( appData + @"\Logs\IBProviderTests.log");
-			File.Delete( appData + @"\Logs\IBProviderService.log");
+			File.Delete( Factory.Log.LogFolder + @"\MBTradingTests.log");
+			File.Delete( Factory.Log.LogFolder + @"\MBTradingService.log");
 	  		symbol = Factory.Symbol.LookupSymbol("CSCO");
 		}
 		
