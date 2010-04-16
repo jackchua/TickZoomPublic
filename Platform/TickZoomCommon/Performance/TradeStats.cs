@@ -33,7 +33,11 @@ namespace TickZoom.Common
 		BaseStats losers;
 		int lossBoundary = 0;
 		
-		public TradeStats( TransactionPairs trades) : base(trades)
+		public TradeStats( TransactionPairs trades) : this(6000,trades) {
+	
+		}
+		
+		public TradeStats( double startingEquity, TransactionPairs trades) : base(startingEquity,trades)
 		{
 			if( trades != null && trades.Count > 0) {
 				calculate();

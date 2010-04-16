@@ -29,10 +29,17 @@ namespace TickZoom.Common
 {
 	public class BaseStats 
 	{
+		private double beginningBalance = 6000;
+		
 		TransactionPairs trades;
 		
-		public BaseStats( TransactionPairs trades)
+		public BaseStats( TransactionPairs trades) : this(6000,trades) {
+			
+		}
+		
+		public BaseStats( double startingEquity, TransactionPairs trades)
 		{
+			this.beginningBalance = startingEquity;
 			this.trades = trades;
 			if( trades != null && trades.Count > 0) {
 				calculate();
@@ -98,8 +105,6 @@ namespace TickZoom.Common
 			}
 			variance = sum / trades.Count;
 		}
-		
-		private double beginningBalance = 6000;
 		
 		public double BeginningBalance {
 			get { return beginningBalance; }

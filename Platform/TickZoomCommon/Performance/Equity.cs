@@ -377,7 +377,7 @@ namespace TickZoom.Common
 		}
 		
 		public EquityStats CalculateStatistics() {
-			return new EquityStats(Daily,Weekly,Monthly,Yearly);
+			return new EquityStats(startingEquity,Daily,Weekly,Monthly,Yearly);
 		}
 		
 		public bool GraphEquity {

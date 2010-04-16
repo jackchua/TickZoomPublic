@@ -27,7 +27,6 @@
  */
 #endregion
 
-
 using System;
 using NUnit.Framework;
 using TickZoom;
@@ -163,6 +162,34 @@ namespace Loaders
 		[Test]
 		public void VerifyStrategy2TradeCount() {
 			VerifyTradeCount(exampleReversal);
+		}
+	}
+	
+	public class ExampleDualStrategyLoader : ModelLoaderCommon
+	{
+		public ExampleDualStrategyLoader() {
+			/// <summary>
+			/// IMPORTANT: You can personalize the name of each model loader.
+			/// </summary>
+			category = "Example";
+			name = "Dual Symbol";
+			IsVisibleInGUI = false;
+		}
+		
+		public override void OnInitialize(ProjectProperties properties) {
+		}
+		
+		public override void OnLoad(ProjectProperties properties) {
+			Portfolio portfolio = CreatePortfolio("Portfolio","Portfolio");
+			Strategy fourTicks = CreateStrategy("ExampleOrderStrategy","FourTicksData");
+			fourTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
+			Strategy reversal = CreateStrategy("ExampleReversalStrategy");
+			reversal.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
+//			portfolio.Performance.Equity.StartingEquity = 100000;
+			AddDependency(portfolio,fourTicks);
+			AddDependency(portfolio,reversal);
+			portfolio.Performance.GraphTrades = false;
+			TopModel = portfolio;
 		}
 	}
 }

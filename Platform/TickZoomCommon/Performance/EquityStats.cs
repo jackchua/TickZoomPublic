@@ -34,12 +34,16 @@ namespace TickZoom.Common
 		TradeStats monthly;
 		TradeStats yearly;
 		
-		public EquityStats(TransactionPairs daily, TransactionPairs weekly, TransactionPairs monthly, TransactionPairs yearly)
+		public EquityStats(TransactionPairs daily, TransactionPairs weekly, TransactionPairs monthly, TransactionPairs yearly) 
+			: this( 6000, daily, weekly, monthly, yearly) {
+		}
+		
+		public EquityStats(double startingEquity, TransactionPairs daily, TransactionPairs weekly, TransactionPairs monthly, TransactionPairs yearly)
 		{
-			this.daily = new TradeStats( daily);
-			this.weekly = new TradeStats( weekly);
-			this.monthly = new TradeStats( monthly);
-			this.yearly = new TradeStats( yearly);
+			this.daily = new TradeStats( startingEquity, daily);
+			this.weekly = new TradeStats( startingEquity, weekly);
+			this.monthly = new TradeStats( startingEquity, monthly);
+			this.yearly = new TradeStats( startingEquity, yearly);
 		}
 		
 		public TradeStats Daily {
