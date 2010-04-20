@@ -185,7 +185,7 @@ namespace TickZoom.Common
 			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
 			engine.EnableTickFilter = ProjectProperties.Engine.EnableTickFilter;
 			
-			engine.Providers = SetupProviders(true,true);
+			engine.Providers = SetupProviders(true,false);
 			engine.BackgroundWorker = BackgroundWorker;
 			engine.RunMode = RunMode.Historical;
 			engine.StartCount = StartCount;

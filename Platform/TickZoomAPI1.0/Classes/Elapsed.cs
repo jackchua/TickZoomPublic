@@ -26,13 +26,10 @@ using System.Text;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of Elapsed.
-	/// </summary>
 	[Serializable]
 	public struct Elapsed : IEquatable<Elapsed>
 	{
-		double _elapsed; // this is just an example member, replace it with your own struct members!
+		double _elapsed;
 		
 		public double elapsed {
 			get { return _elapsed; }

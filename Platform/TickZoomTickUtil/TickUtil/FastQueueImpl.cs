@@ -69,7 +69,7 @@ namespace TickZoom.TickUtil
 		Exception exception;
 
         public FastQueueImpl(object name)
-            : this(name, 20000)
+            : this(name, 1000)
         {
 
         }

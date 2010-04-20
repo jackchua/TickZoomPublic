@@ -730,6 +730,16 @@ namespace TickZoom.Api
 			return lhs;
 		}
 		
+		public static explicit operator TimeStamp( long timeStamp)
+		{
+			return new TimeStamp(timeStamp);
+		}
+		
+		public static explicit operator long( TimeStamp TimeStamp )
+		{
+			return TimeStamp.Internal;
+		}
+		
 		public static explicit operator double( TimeStamp TimeStamp )
 		{
 			return TimeStamp._timeStamp / (double) MillisecondsPerDay;
@@ -745,12 +755,6 @@ namespace TickZoom.Api
 		{
 			
 			return new TimeStamp( DateTimeTotimeStamp( dt ) / (double) MillisecondsPerDay );
-		}
-		
-		public static explicit operator TimeStamp( long value)
-		{
-			
-			return new TimeStamp( value );
 		}
 		
 		public static bool operator >=( TimeStamp lhs, TimeStamp rhs)

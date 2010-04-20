@@ -64,7 +64,7 @@ namespace TickZoom.TickUtil
 		/// <inheritdoc/>
 		public void SetTime(TimeStamp utcTime)
 		{
-			binary.UtcTime = utcTime;
+			binary.UtcTime = (long) utcTime;
 			if( utcTime.Internal >= nextUtcOffsetUpdate.Internal) {
 				if( timeZone == null) {
 					if( binary.Symbol == 0) {
@@ -79,7 +79,7 @@ namespace TickZoom.TickUtil
 				nextUtcOffsetUpdate.AddDays( 7 - dayOfWeek);
 				nextUtcOffsetUpdate.SetDate(nextUtcOffsetUpdate.Year,nextUtcOffsetUpdate.Month,nextUtcOffsetUpdate.Day);
 			}
-			localTime = binary.UtcTime;
+			localTime = (TimeStamp) binary.UtcTime;
 			localTime.AddSeconds(utcOffset);
 		}
 		
@@ -217,7 +217,7 @@ namespace TickZoom.TickUtil
 		internal void init(TimeStamp utcTime, long lBid, long lAsk) {
 			ClearContentMask();
 			dataVersion = TickVersion;
-			binary.UtcTime = utcTime;
+			binary.UtcTime = (long) utcTime;
 			IsQuote=true;
 			binary.Bid = lBid;
 			binary.Ask = lAsk;
@@ -362,7 +362,7 @@ namespace TickZoom.TickUtil
 			fixed( byte *fptr = &buffer[writer.Position]) {
 				byte *ptr = fptr;
 				*(ptr) = dataVersion; ptr++;
-				*(long*)(ptr) = binary.UtcTime.Internal; ptr+=sizeof(double);
+				*(long*)(ptr) = binary.UtcTime; ptr+=sizeof(double);
 				*(ptr) = binary.ContentMask; ptr++;
 				if( IsQuote) {
 					*(long*)(ptr) = binary.Bid; ptr += sizeof(long);
@@ -392,7 +392,7 @@ namespace TickZoom.TickUtil
 		
 		private unsafe int FromFileVersion8(byte *fptr) {
 			byte *ptr = fptr;
-	    	binary.UtcTime.Internal = *(long*)ptr; ptr+=sizeof(double);
+	    	binary.UtcTime = *(long*)ptr; ptr+=sizeof(double);
 			binary.ContentMask = *ptr; ptr++;
 			if( IsQuote ) {
 				binary.Bid = * (long*) ptr; ptr+=sizeof(long);
@@ -425,7 +425,7 @@ namespace TickZoom.TickUtil
 //			if( d < 0) {
 //				int x = 0;
 //			}
-			binary.UtcTime.dInternal = d;
+			binary.UtcTime = new TimeStamp(d).Internal;
 //			if( binary.UtcTime.ToString().Contains("Error")) {
 //				int x = 0;
 //			}
@@ -465,7 +465,7 @@ namespace TickZoom.TickUtil
 		
 		private int FromFileVersion6(BinaryReader reader) {
 			int position = 0;
-			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
+			binary.UtcTime = new TimeStamp(reader.ReadDouble()).Internal; position += 8;
 			binary.Bid = reader.ReadInt64(); position += 8;
 			binary.Ask = reader.ReadInt64(); position += 8;
 			ClearContentMask();
@@ -494,7 +494,7 @@ namespace TickZoom.TickUtil
 
 		private int FromFileVersion5(BinaryReader reader) {
 			int position = 0;
-			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
+			binary.UtcTime = new TimeStamp(reader.ReadDouble()).Internal; position += 8;
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid + spread;
@@ -531,7 +531,7 @@ namespace TickZoom.TickUtil
 			for( int i=0; i<TickBinary.SymbolSize; i++) {
 				reader.ReadChar(); position += 2;
 			}
-			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
+ 			binary.UtcTime = new TimeStamp(reader.ReadDouble()).Internal; position += 8;
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid + spread;
@@ -565,7 +565,7 @@ namespace TickZoom.TickUtil
 		private int FromFileVersion3(BinaryReader reader) {
 			int position = 0;
 			DateTime tickTime = DateTime.FromBinary(reader.ReadInt64()); position += 8;
-			binary.UtcTime = new TimeStamp(tickTime.ToLocalTime());
+			binary.UtcTime = (long) new TimeStamp(tickTime.ToLocalTime());
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid+spread;
@@ -596,7 +596,7 @@ namespace TickZoom.TickUtil
 		private int FromFileVersion2(BinaryReader reader) {
 			int position = 0;
 			DateTime tickTime = DateTime.FromBinary(reader.ReadInt64()); position += 8;
-			binary.UtcTime = new TimeStamp(tickTime.ToLocalTime());
+			binary.UtcTime = (long) new TimeStamp(tickTime.ToLocalTime());
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid+spread;
@@ -622,7 +622,7 @@ namespace TickZoom.TickUtil
 			
 			long int64 = reader.ReadInt64() ^ -9223372036854775808L;
 			DateTime tickTime = DateTime.FromBinary(int64); position += 8;
-			binary.UtcTime = (TimeStamp) tickTime.AddHours(-4);
+			binary.UtcTime = (long) (TimeStamp) tickTime.AddHours(-4);
 			
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
@@ -771,7 +771,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public TimeStamp UTCTime {
-			get { return binary.UtcTime; }
+			get { return (TimeStamp)binary.UtcTime; }
 		}
 		
 		public override int GetHashCode()
@@ -806,7 +806,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public TimeStamp UtcTime {
-			get { return binary.UtcTime; }
+			get { return (TimeStamp)binary.UtcTime; }
 		}
 
 		public ulong lSymbol {
@@ -903,7 +903,7 @@ namespace TickZoom.TickUtil
 
 		public void Inject(TickBinary tick) {
 			binary = tick;
-			SetTime(binary.UtcTime);
+			SetTime((TimeStamp)binary.UtcTime);
 //			string x = ToString();
 		}
 		

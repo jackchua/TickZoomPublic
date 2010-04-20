@@ -156,7 +156,9 @@ namespace TickZoom.StarterTest
 	    
 		public class OptimizeLoader : ModelLoaderCommon {
 			public OptimizeLoader() {
-				IsVisibleInGUI = false;
+				category = "Test";
+				name = "Optimize";
+				IsVisibleInGUI = true;
 			}
 			
 			public override void OnInitialize(ProjectProperties properties) {

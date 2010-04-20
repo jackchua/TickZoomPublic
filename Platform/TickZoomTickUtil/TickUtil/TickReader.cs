@@ -53,11 +53,11 @@ namespace TickZoom.TickUtil
 		}
 		
 		public sealed override bool IsAtEnd(TickBinary tick) {
-			return tick.UtcTime >= endTime;
+			return tick.UtcTime >= (long)endTime;
 		}
 		
 		public sealed override bool IsAtStart(TickBinary tick) {
-			return tick.UtcTime > startTime;
+			return tick.UtcTime > (long)startTime;
 		}
 		
 		public TimeStamp StartTime {

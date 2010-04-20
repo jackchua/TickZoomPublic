@@ -34,7 +34,7 @@ namespace TickZoom.Api
 		
 		public ulong Symbol;
 		public byte ContentMask;
-		public TimeStamp UtcTime;
+		public long UtcTime;
 		public long Bid;
 		public long Ask;
 		public byte Side;
@@ -42,6 +42,5 @@ namespace TickZoom.Api
 		public int Size;
 		public fixed ushort DepthAskLevels[DomLevels];
 		public fixed ushort DepthBidLevels[DomLevels];
-		
 	}
 }
