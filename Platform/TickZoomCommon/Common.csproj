@@ -96,6 +96,7 @@
     <Compile Include="Indicators\InverseFisherTransform.cs" />
     <Compile Include="Indicators\LinearRegression.cs" />
     <Compile Include="Indicators\PercentR.cs" />
+    <Compile Include="Indicators\Range.cs" />
     <Compile Include="Indicators\RSI.cs" />
     <Compile Include="Indicators\SMA.cs" />
     <Compile Include="Indicators\T3Average.cs" />

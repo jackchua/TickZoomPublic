@@ -27,6 +27,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
+
 	/// <summary>
 	/// Description of Formulas.
 	/// </summary>
@@ -90,7 +91,39 @@ namespace TickZoom.Common
 		}
 		#endregion
 		
+		public int TradesToday(TimeStamp timeStamp) {
+			Strategy strategy = model as Strategy;
+			int year = timeStamp.Year;
+			int month = timeStamp.Month;
+			int day = timeStamp.Day;
+			int count = 0;
+			if( strategy != null) {
+				for( int i=strategy.Performance.ComboTrades.Count-1; i>=0; i--) {
+					var trade = strategy.Performance.ComboTrades[i];
+					TimeStamp exitTime = trade.ExitTime;
+					if( year == trade.ExitTime.Year &&
+					    month == trade.ExitTime.Month &&
+					    day == trade.ExitTime.Day) {
+						count++;	
+					}
+					if( exitTime < timeStamp) break;
+				}
+			}
+			return count;
+		}
 		#region Convenience methods to create indicators
+		public Range Range(Bars bars) {
+			Range range = new Range(bars);
+			model.AddDependency(range);
+			return range;
+		}
+		
+		public Range Range() {
+			Range range = new Range(model.Bars);
+			model.AddDependency(range);
+			return range;
+		}
+		
 		public CCI CCI(object obj, int period) {
 			CCI cci = new CCI(obj,period);
 			model.AddDependency(cci);
