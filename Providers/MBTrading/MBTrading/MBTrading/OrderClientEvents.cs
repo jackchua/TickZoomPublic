@@ -53,5 +53,6 @@ namespace TickZoom.MBTrading
         void MBTORDERSLib._IMbtOrderClientEvents.OnPositionStrategyGroupRemoved(MBTORDERSLib.MbtPositionStrategyGroup group) { }
         void MBTORDERSLib._IMbtOrderClientEvents.OnPositionStrategyGroupUpdated(MBTORDERSLib.MbtPositionStrategyGroup group) { }
         void MBTORDERSLib._IMbtOrderClientEvents.OnPositionStrategyGroupAdded(MBTORDERSLib.MbtPositionStrategyGroup group) { }
+        void MBTORDERSLib._IMbtOrderClientEvents.OnJournalSubmit(string value) { }
     }
 }
