@@ -106,6 +106,7 @@
     <Compile Include="EngineInterfaces\Bars.cs" />
     <Compile Include="EngineInterfaces\CircularList.cs" />
     <Compile Include="EngineInterfaces\FastQueue.cs" />
+    <Compile Include="EngineInterfaces\ICircularArray.cs" />
     <Compile Include="EngineInterfaces\ISymbolProperties.cs" />
     <Compile Include="EngineInterfaces\NewEventDetail.cs" />
     <Compile Include="EngineInterfaces\PositionChangeDetail.cs" />

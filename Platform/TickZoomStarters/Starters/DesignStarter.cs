@@ -160,9 +160,7 @@ namespace TickZoom.Common
 	    protected virtual void Dispose(bool disposing)
 	    {
        		if( !isDisposed) {
-	    		lock( taskLocker) {
-		            isDisposed = true;   
-	    		}
+	            isDisposed = true;   
     		}
 	    }
 	    

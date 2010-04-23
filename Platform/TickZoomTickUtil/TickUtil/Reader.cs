@@ -354,8 +354,8 @@ namespace TickZoom.TickUtil
 	    protected virtual void Dispose(bool disposing)
 	    {
        		if( !isDisposed) {
+				isDisposed = true;
 	    		lock( taskLocker) {
-					isDisposed = true;
 					if( fileReaderTask != null) {
 						fileReaderTask.Stop();
 						fileReaderTask.Join();

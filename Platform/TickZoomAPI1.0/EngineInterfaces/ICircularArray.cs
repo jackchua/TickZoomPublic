@@ -25,11 +25,10 @@ using System;
 
 namespace TickZoom.Api
 {
-
-
-	public interface CircularList<T> : ICircularArray {
-		T this[int position] {
-			get;
-		}
+	public interface ICircularArray 
+	{
+		int Count {get;}
+		int BarCount {get;}
+		void Release();
 	}
 }
