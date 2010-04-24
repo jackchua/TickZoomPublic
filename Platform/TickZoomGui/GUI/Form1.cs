@@ -530,7 +530,7 @@ namespace TickZoom
         	StopProcess();
         	CloseCharts();
             commandWorker.CancelAsync();
-            Factory.Engine.Release();
+            Factory.Engine.Dispose();
             Factory.Provider.Release();
             TickReader.CloseAll();
         }

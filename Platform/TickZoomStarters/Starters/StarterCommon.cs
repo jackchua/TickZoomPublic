@@ -65,7 +65,7 @@ namespace TickZoom.Common
 		
 		public StarterCommon(bool releaseEngineCache) {
 			if( releaseEngineCache) {
-				Factory.Engine.Release();
+				Factory.Engine.Dispose();
 				Factory.Provider.Release();
 			}
 			string dataFolder = Factory.Settings["DataFolder"];
@@ -75,7 +75,7 @@ namespace TickZoom.Common
 		}
 		
 		public void Release() {
-			Factory.Engine.Release();
+			Factory.Engine.Dispose();
 			Factory.Provider.Release();
 		}
 		

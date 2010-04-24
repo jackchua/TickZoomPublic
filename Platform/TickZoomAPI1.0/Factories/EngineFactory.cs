@@ -31,10 +31,8 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of Factory.
 	/// </summary>
-	public interface EngineFactory
+	public interface EngineFactory : IDisposable
 	{
-		void Release();
-		
 		TickEngine TickEngine {
 			get;
 		}
