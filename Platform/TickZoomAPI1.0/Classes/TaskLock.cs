@@ -27,24 +27,31 @@ using System.Threading;
 namespace TickZoom.Api
 {
 	public class TaskLock : IDisposable {
+		private static readonly Log log = Factory.Log.GetLogger(typeof(TaskLock));
 	    private int isLocked = 0;
+	    private int lockCount = 0;
 	    
 		public bool IsLocked {
-			get { return isLocked == 1; }
+			get { return isLocked != 0; }
 		}
 	    
 		public bool TryLock() {
-	    	return isLocked == 0 && Interlocked.CompareExchange(ref isLocked,1,0) == 0;
+	    	if( isLocked == Thread.CurrentThread.ManagedThreadId) {
+	    		Thread.BeginCriticalRegion();
+	    		lockCount++;
+	    		return true;
+	    	} else if( isLocked == 0 && Interlocked.CompareExchange(ref isLocked,Thread.CurrentThread.ManagedThreadId,0) == 0) {
+	    		Thread.BeginCriticalRegion();
+	    		lockCount++;
+	    		return true;
+	    	} else {
+	    		return false;
+	    	}
 	    }
 	    
 		public void Lock() {
-//			int lockSpins = 0;
 			while( !TryLock()) {
-//	    		Interlocked.Increment(ref lockSpins);
 				Factory.Parallel.Yield();
-//	    		if( lockSpins > 1000000) {
-//	    			throw new ApplicationException("Deadlock error");
-//	    		}
 	    	}
 	    }
 	    
@@ -54,9 +61,23 @@ namespace TickZoom.Api
 	    }
 	    
 	    public void Unlock() {
-	    	isLocked = 0;
+	    	if( isLocked == Thread.CurrentThread.ManagedThreadId) {
+	    		lockCount --;
+	    		if( lockCount <= 0) {
+	    			ForceUnlock();
+	    		}
+	    	} else {
+	    		string message = "Attempt to unlock from a different managed thread.";
+	    		log.Error( message + "\n" + Environment.StackTrace);
+	    		throw new ApplicationException( message);
+	    	}
 	    }
 	    
+	    public void ForceUnlock() {
+	    	Thread.EndCriticalRegion();
+   			isLocked = 0;
+   			lockCount = 0;
+	    }
 		
 		public void Dispose()
 		{
