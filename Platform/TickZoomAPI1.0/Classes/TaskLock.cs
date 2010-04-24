@@ -31,8 +31,12 @@ namespace TickZoom.Api
 	    private int isLocked = 0;
 	    private int lockCount = 0;
 	    
-		public bool IsLocked {
-			get { return isLocked != 0; }
+		public bool AlreadyLocked {
+			get { return isLocked != 0 && isLocked == Thread.CurrentThread.ManagedThreadId; }
+		}
+	    
+		public bool WillBlock {
+			get { return isLocked != 0 && isLocked != Thread.CurrentThread.ManagedThreadId; }
 		}
 	    
 		public bool TryLock() {

@@ -106,7 +106,7 @@ namespace TickZoom.TickUtil
 	    }
 	    
 	    public bool CanEnqueue {
-	    	get { return queue != null && queue.Count<maxSize && !spinLock.IsLocked; }
+	    	get { return queue != null && queue.Count<maxSize && !spinLock.WillBlock; }
 	    }
 	    
 	    public bool CanDequeue {
@@ -114,7 +114,7 @@ namespace TickZoom.TickUtil
 		    	if( !isStarted) { 
 		    		if( !StartDequeue()) return false;
 		    	}
-	    		return queue!=null && queue.Count>0 && !spinLock.IsLocked;
+	    		return queue!=null && queue.Count>0 && !spinLock.WillBlock;
 	    	}
 	    }
 	    
