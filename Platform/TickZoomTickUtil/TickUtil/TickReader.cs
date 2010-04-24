@@ -72,12 +72,6 @@ namespace TickZoom.TickUtil
 			      endDouble = endTime.Internal; }
 		}
 
-        public void Stop(Receiver receiver)
-        {
-            if (debug) log.Debug("Stop(" + receiver + ")");
-            Dispose();
-        }
-
         public void StartSymbol(Receiver receiver, SymbolInfo symbol, object eventDetail)
 		{
 //			receiverInternal = receiver;

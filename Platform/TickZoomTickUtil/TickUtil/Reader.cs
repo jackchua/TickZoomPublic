@@ -135,6 +135,18 @@ namespace TickZoom.TickUtil
 			StartupTask();
 			fileReaderTask = Factory.Parallel.IO.Loop(this,FileReader);
 		}
+        
+        public void Stop(Receiver receiver)
+        {
+            if (debug) log.Debug("Stop(" + receiver + ")");
+			if( receiver != null) {
+            	if( !receiver.CanReceive(symbol)) {
+            		log.Warn("Can't receive Terminate message");
+            	}
+				receiver.OnEvent(null,(int)EventType.Terminate,null);
+			}
+            Dispose();
+        }
 		
 		public abstract bool IsAtStart(TickBinary tick);
         public abstract bool IsAtEnd(TickBinary tick);
@@ -325,23 +337,23 @@ namespace TickZoom.TickUtil
 				} catch( Exception ex) {
 					log.Debug( "Exception on progressCallback: " + ex.Message);
 				}
-				if( debug) log.Debug("calling receiver.OnEvent(symbol,(int)EventType.EndHistorical,)");
+				if( debug) log.Debug("calling receiver.OnEvent(symbol,(int)EventType.EndHistorical)");
 				if( count > 0) {
 					receiver.OnEvent(symbol,(int)EventType.EndHistorical,null);
 				}
-		    	fileReaderTask.Stop();
-		    		} catch ( ThreadAbortException) {
-				
-		    		} catch ( FileNotFoundException ex) {
-		    			log.Error( "ERROR: " + ex.Message);
-		    		} catch ( Exception ex) {
-		    			log.Error( "ERROR: " + ex);
-		    		} finally {
+    		} catch ( ThreadAbortException) {
+		
+    		} catch ( FileNotFoundException ex) {
+    			log.Error( "ERROR: " + ex.Message);
+    		} catch ( Exception ex) {
+    			log.Error( "ERROR: " + ex);
+    		} finally {
 				isDisposed = true;
-		    			if( dataIn != null) {
-		    				dataIn.Close();
-		    			}
-		    		}
+				fileReaderTask.Stop();
+				if( dataIn != null) {
+					dataIn.Close();
+				}
+    		}
 			return true;
 		}
 		
@@ -364,9 +376,6 @@ namespace TickZoom.TickUtil
 						dataIn.Close();
 					}
 					readerList.Remove(this);
-					if( receiver != null && receiver.CanReceive(symbol)) {
-						receiver.OnEvent(null,(int)EventType.Terminate,null);
-					}
 	    		}
     		}
 	    }
