@@ -177,8 +177,8 @@ namespace TickZoom.TickUtil
 	    }
 	    
 	    public void Terminate() {
-	   		SpinUnLock();
 	    	terminate = true;
+	    	spinLock.ForceUnlock();
 	        if( queue!=null) {
 		        QueuePool.Free(queue);
 		        queue=null;

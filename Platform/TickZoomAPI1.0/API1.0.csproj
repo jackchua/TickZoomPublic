@@ -79,9 +79,10 @@
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\SymbolTimeZone.cs" />
     <Compile Include="Classes\SyncTicks.cs" />
-    <Compile Include="Classes\TaskLock.cs" />
+    <Compile Include="Classes\SimpleLock.cs" />
     <Compile Include="Classes\TickBinary.cs" />
     <Compile Include="Classes\TimeStamp.cs" />
+    <Compile Include="Classes\TaskLock.cs" />
     <Compile Include="ClientInterfaces\DrawingInterface.cs" />
     <Compile Include="ClientInterfaces\EventType.cs" />
     <Compile Include="ClientInterfaces\IndicatorInterface.cs" />

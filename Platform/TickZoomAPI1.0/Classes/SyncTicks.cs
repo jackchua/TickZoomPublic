@@ -42,15 +42,15 @@ namespace TickZoom.Api
 	public static class SyncTicks {
 		private static int mockTradeCount = 0;
 		private static bool enabled = false;
-		private static Dictionary<ulong,TaskLock> tickSyncs;
+		private static Dictionary<ulong,SimpleLock> tickSyncs;
 		private static object locker = new object();
 		
-		public static Dictionary<ulong, TaskLock> TickSyncs {
+		public static Dictionary<ulong, SimpleLock> TickSyncs {
 			get { 
 				if( tickSyncs == null) {
 					lock( locker) {
 						if( tickSyncs == null) {
-							tickSyncs = new Dictionary<ulong,TaskLock>();
+							tickSyncs = new Dictionary<ulong,SimpleLock>();
 						}
 					}
 				}
@@ -58,13 +58,13 @@ namespace TickZoom.Api
 			}
 		}
 		
-		public static TaskLock GetTickSync(ulong symbolBinaryId) {
-			TaskLock tickSync;
+		public static SimpleLock GetTickSync(ulong symbolBinaryId) {
+			SimpleLock tickSync;
 			lock( locker) {
 				if( TickSyncs.TryGetValue(symbolBinaryId,out tickSync)) {
 				   	return tickSync;
 				} else {
-					tickSync = new TaskLock();
+					tickSync = new SimpleLock();
 					TickSyncs.Add(symbolBinaryId,tickSync);
 					return tickSync;
 				}

@@ -42,7 +42,7 @@ namespace TickZoom.Common
 		private static readonly bool debug = log.IsDebugEnabled;
 		private TickQueue tickQueue = Factory.TickUtil.TickQueue(typeof(VerifyFeed));
 		private volatile bool isRealTime = false;
-		private TaskLock syncTicks;
+		private SimpleLock syncTicks;
 		private volatile ReceiverState receiverState = ReceiverState.Ready;
 		private Task task;
 		private static object taskLocker = new object();
