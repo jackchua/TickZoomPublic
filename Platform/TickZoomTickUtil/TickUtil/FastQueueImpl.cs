@@ -35,11 +35,12 @@ namespace TickZoom.TickUtil
 		}
 	}
 	
-	public class FastQueueImpl<T> : FastQueue<T> where T : struct
+	public class FastQueueImpl<T> : FastQueue<T> // where T : struct
 	{
-		readonly Log log;
-		readonly bool debug;
-		readonly bool trace;
+		private static readonly Log log = Factory.Log.GetLogger(typeof(FastQueueImpl<T>));
+		private static readonly bool debug = log.IsDebugEnabled;
+		private static readonly bool trace = log.IsTraceEnabled;
+		private readonly Log instanceLog;
 		string name;
 		long lockSpins = 0;
 		long lockCount = 0;
@@ -75,10 +76,8 @@ namespace TickZoom.TickUtil
         }
 
 	    public FastQueueImpl(object name, int maxSize) {
-			log = Factory.Log.GetLogger("TickZoom.TickUtil.FastQueue."+name);
-			debug = log.IsDebugEnabled;
-			trace = log.IsTraceEnabled;
-	    	log.Debug("Created with capacity " + maxSize);
+			instanceLog = Factory.Log.GetLogger("TickZoom.TickUtil.FastQueue."+name);
+			if( debug) log.Debug("Created with capacity " + maxSize);
             if( name is string)
             {
                 this.name = (string) name;
@@ -134,7 +133,6 @@ namespace TickZoom.TickUtil
             SpinUnLock();
             return true;
 	    }
-	    T empty = new T();
 	    public bool DequeueStruct(ref T tick)
 	    {
             if( terminate) {
@@ -144,7 +142,7 @@ namespace TickZoom.TickUtil
 	            	throw new QueueException(EventType.Terminate);
 	    		}
             }
-	    	tick = empty;
+	    	tick = default(T);
 	    	if( !isStarted) { 
 	    		if( !StartDequeue()) return false;
 	    	}
@@ -156,7 +154,7 @@ namespace TickZoom.TickUtil
 	    }
 	    
 	    public void Clear() {
-	    	log.Debug("Clear called");
+	    	if( debug) log.Debug("Clear called");
 	    	if( !terminate) {
 	    		while( !SpinLockNB()) ;
 		        queue.Clear();
@@ -165,7 +163,7 @@ namespace TickZoom.TickUtil
 	    }
 	    
 	    public void Flush() {
-	    	log.Debug("Flush called");
+	    	if( debug) log.Debug("Flush called");
 	    	while(!terminate && queue.Count>0) {
 	    		Factory.Parallel.Yield();
 	    	}
@@ -230,7 +228,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void Pause() {
-	    	log.Debug("Pause called");
+			if( debug) log.Debug("Pause called");
 			if( !isPaused) {
 				isPaused = true;
 				if( PauseEnqueue != null) {
@@ -240,7 +238,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void Resume() {
-	    	log.Debug("Resume called");
+			if( debug) log.Debug("Resume called");
 			if( isPaused) {
 				isPaused = false;
 				if( ResumeEnqueue != null) {
