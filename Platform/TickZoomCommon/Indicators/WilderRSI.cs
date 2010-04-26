@@ -8,6 +8,9 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
  * 
+ * Business use restricted to 30 days except as otherwise stated in
+ * in your Service Level Agreement (SLA).
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -30,8 +33,8 @@ namespace TickZoom.Common
 {
 	/// <summary>
 	/// Relative Strength Index. Introduced by J. Wells Wilder in his 1978 book, 
-	/// “New Concepts in Technical Trading Systems”. The RSI compares a trading 
-	/// instrument’s magnitude of recent gains against its magnitude of recent losses 
+	/// ï¿½New Concepts in Technical Trading Systemsï¿½. The RSI compares a trading 
+	/// instrumentï¿½s magnitude of recent gains against its magnitude of recent losses 
 	/// and quantifies this information into a value that ranges between 0 and 100.
 	/// FB 20091230: complete rewrite using Wilder's EMA instead of SMA
 	/// </summary>
