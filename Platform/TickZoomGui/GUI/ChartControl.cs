@@ -1122,10 +1122,10 @@ namespace TickZoom
 					} else {
 						    toolStripStatusXY.Text = time.ToLongDateString() + " " + 
 							time.ToLongTimeString() + ", " +
-							"O:" + startPair.Open.ToString(",0.000") + ", " + 
-							"H:" + startPair.High.ToString(",0.000") + ", " + 
-							"L:" + startPair.Low.ToString(",0.000") + ", " + 
-							"C:" + startPair.Close.ToString(",0.000") + ", " +
+							"O:" + startPair.Open.ToString(",0.0000") + ", " + 
+							"H:" + startPair.High.ToString(",0.0000") + ", " + 
+							"L:" + startPair.Low.ToString(",0.0000") + ", " + 
+							"C:" + startPair.Close.ToString(",0.0000") + ", " +
 							"Bar: " + (dragIndex+1) + ", " +
 							"Period: " + intervalChartBar;
 					}

@@ -84,6 +84,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void OnEvent(SymbolInfo symbo, int eventType, object eventDetail) {
+	    	if( isDisposed) return;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:

@@ -171,7 +171,7 @@ namespace TickZoom.Common
 		public bool OnIntervalClose()
 		{
 			if( graphEquity) {
-				equity[0] = CurrentEquity;
+				equity[0] = (long) CurrentEquity;
 			}
 			return true;
 		}

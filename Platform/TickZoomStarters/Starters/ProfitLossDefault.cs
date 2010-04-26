@@ -39,8 +39,8 @@ namespace TickZoom.Common
 		
 		
 		public double CalculateProfit( double position, double entry, double exit) {
-			double transactionCosts = (slippage + commission)*1/*symbol.FullPointValue*/*Math.Abs(position);
-			double pnl = ((exit - entry) * position * 1/*symbol.FullPointValue*/) - transactionCosts;
+			double transactionCosts = (slippage + commission)*symbol.FullPointValue*Math.Abs(position);
+			double pnl = ((exit - entry) * position * symbol.FullPointValue) - transactionCosts;
 			return pnl.Round();
 		}
 		
