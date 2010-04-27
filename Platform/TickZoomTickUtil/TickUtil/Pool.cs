@@ -88,6 +88,7 @@ namespace TickZoom.TickUtil
 	    	}
 	    }
 	}
+	
 	public class Pool<T> where T : new()
 	{
 	    private Stack<T> _items = new Stack<T>();
