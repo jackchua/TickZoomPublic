@@ -44,6 +44,7 @@ namespace TickZoom.Api
 		EndRealTime,
 		EndHistorical,
 		StartRealTime,
+        TickBatch,
 		TimeSync,
 		
 		// TCP/IP Events

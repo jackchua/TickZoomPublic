@@ -29,8 +29,6 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-
-	
 	public class PositionChangeDetail {
 		private SymbolInfo symbol;
 		public double position;
