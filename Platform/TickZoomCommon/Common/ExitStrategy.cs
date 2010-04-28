@@ -292,9 +292,9 @@ namespace TickZoom.Common
 		
 		private void LogExit(string description) {
 			if( Strategy.Chart.IsDynamicUpdate) {
-				Log.Notice(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
+				Log.Notice(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.ChartBars.CurrentBar+", " + description);
 			} else if( !Strategy.IsOptimizeMode) {
-				if( IsDebug) Log.Debug(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
+				if( IsDebug) Log.Debug(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.ChartBars.CurrentBar+", " + description);
 			}
 		}
 
