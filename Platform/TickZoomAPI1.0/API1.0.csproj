@@ -114,6 +114,7 @@
     <Compile Include="EngineInterfaces\Provider.cs" />
     <Compile Include="EngineInterfaces\QueueItem.cs" />
     <Compile Include="EngineInterfaces\QuoteType.cs" />
+    <Compile Include="EngineInterfaces\ReadWritable.cs" />
     <Compile Include="EngineInterfaces\StartSymbolDetail.cs" />
     <Compile Include="EngineInterfaces\SymbolInfo.cs" />
     <Compile Include="EngineInterfaces\InstrumentType.cs" />

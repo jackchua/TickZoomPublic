@@ -253,9 +253,13 @@ namespace TickZoom.Common
 		public int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds)
 		{
 			int end = startTime + timeoutSeconds * 1000;
-			while( count < expectedTickCount && Environment.TickCount < end) {
+			while( !isRealTime && Environment.TickCount < end) {
 				Thread.Sleep(100);
 			}
+			while( isRealTime && count < expectedTickCount && Environment.TickCount < end) {
+				Thread.Sleep(100);
+			}
+			log.Notice("Last tick received: " + tickIO.ToPosition());
 			Factory.TickUtil.TickQueue("Stats").LogStats();
 			Dispose();
 			return count;
@@ -275,6 +279,9 @@ namespace TickZoom.Common
 					if (debug && count < 5) {
 						log.Debug("Received a tick " + tickIO);
 						countLog++;
+					}
+					if( count == 0) {
+						log.Notice("First tick received: " + tickIO.ToPosition());
 					}
 					count++;
 					if (count % 1000000 == 0) {

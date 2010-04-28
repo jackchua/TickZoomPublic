@@ -50,21 +50,7 @@ namespace TickZoom.Api
 		}
 	}
 	
-	public interface ReadWritable<T> : Serializable {
-		void Inject(T tick);
-		void SetSymbol(ulong lSymbol);
-		/// <summary>
-		/// Sets the time of the tick. 
-		/// </summary>
-		/// <param name="utcTime">Must be the UTC time.</param>
-		void SetTime(TimeStamp utcTime);
-		T Extract();
-		int FromReader(byte version, BinaryReader reader);
-		object ToPosition();
-		byte DataVersion {
-			get;
-		}
-	}
+
 	
 	public enum ReceiverState {
 		Start,

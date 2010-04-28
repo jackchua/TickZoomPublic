@@ -207,7 +207,6 @@ namespace TickZoom
 			layoutLastPane();
 			MasterPane master = dataGraph.MasterPane;
 			master.IsFontsScaled = false;
-	//			PaneList paneList = master.PaneList;
 			using ( Graphics g = this.CreateGraphics() )
 			{
 				
