@@ -59,7 +59,15 @@ namespace TickZoom.MBTrading
         private bool cancelThread = false;
         private Receiver receiver;
         private double lastBid;
+        
+		public double LastBid {
+			get { return lastBid; }
+		}
         private double lastAsk;
+        
+		public double LastAsk {
+			get { return lastAsk; }
+		}
         private int lastBidSize;
         private int lastAskSize;
         TickIO lastTick;
@@ -178,6 +186,8 @@ namespace TickZoom.MBTrading
         		default:
         			throw new ApplicationException("Invalid Level II Side");
         	}
+			lastBid = level2Bids.LastPrice;
+			lastAsk = level2Asks.LastPrice;
         	if( Environment.TickCount > lastChangeTime + 30) {
         		if( level2Bids.HasChanged || level2Asks.HasChanged ) {
 	        		LogLevel2Change(false,TradeSide.Unknown,0,0);
@@ -265,8 +275,8 @@ namespace TickZoom.MBTrading
     		level2Bids.UpdateTotalSize();
     		level2Asks.UpdateTotalSize();
     		
-    		if( LastBid > 0 && LastAsk > 0) {
-    			tick.SetQuote(LastBid, LastAsk);
+    		if( level2Bids.LastPrice > 0 && level2Asks.LastPrice > 0) {
+    			tick.SetQuote(level2Bids.LastPrice, level2Asks.LastPrice);
     			tick.SetDepth(level2Bids.DepthSizes,level2Asks.DepthSizes);
     			if( trace) log.Trace("Level2 SetQuote(), SetDepth()");
     			return true;
@@ -280,6 +290,8 @@ namespace TickZoom.MBTrading
     	long followupSignal = 0;
     	bool orderSubmitted = false;
     	int ignoredTickCount = 0;
+    	bool isStoredSize = false;
+    	long storedSize = 0;
 	    public void Signal( double _size) {
     		lock(signalLock) {
 
@@ -287,7 +299,9 @@ namespace TickZoom.MBTrading
     			int elapsed = Environment.TickCount - ignoredTickCount;
 		    	if( m_account == null) {
 	    			if( ignoredTickCount == 0 || elapsed > 5000) {
-		    			orderLog.Notice( "Signal("+size+") ignored. Account not loaded.");
+		    			orderLog.Notice( "Signal("+size+") storing. Account not loaded.");
+						isStoredSize = true;
+						storedSize = size;
 		    			ignoredTickCount = Environment.TickCount;
     				}
 		    		return;
@@ -347,7 +361,7 @@ namespace TickZoom.MBTrading
             long lVol = Math.Abs(size);
             int lBuySell = size > 0 ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
 			string sSym = symbol.Symbol;
-			double dPrice = size > 0 ? LastAsk : LastBid;
+			double dPrice = size > 0 ? lastAsk : lastBid;
 			int	lTIF = MBConst.VALUE_GTC;
             int lOrdType = MBConst.VALUE_MARKET;
 			int lVolType = MBConst.VALUE_NORMAL;
@@ -475,6 +489,10 @@ namespace TickZoom.MBTrading
 		    		} else {
 			    		orderLog.Notice("Order " + orderNum + ": Cancel Failed: " + bstrRetMsg);
 		    		}
+		    	}
+		    	if( isStoredSize) {
+		    		SubmitOrder(storedSize);
+		    		isStoredSize = false;
 		    	}
 	    	}
 	    	firstTime = false;
@@ -643,14 +661,7 @@ namespace TickZoom.MBTrading
 		public SymbolInfo Symbol {
 			get { return symbol; }
 		}
-		public double LastAsk {
-			get { return level2Asks.LastPrice; }
-		}
         
-		public double LastBid {
-			get { return level2Bids.LastPrice; }
-		}
-    	
 		public MbtAccount Account {
 			get { return m_account; }
 			set { m_account = value; }
