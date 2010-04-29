@@ -109,6 +109,8 @@ namespace TickZoom.MBTrading
 			    pTimeAndSales.cond == enumTickCondition.tcTrade_RegularSale &&
 			    pTimeAndSales.lType == InsideMarketHours) {
 				CreateTick();
+				lastAsk = lastBid = pTimeAndSales.dPrice;
+		    	CheckSignalSync();
 				tick.SetTrade(pTimeAndSales.dPrice, pTimeAndSales.lSize);
 				if( Symbol.QuoteType == QuoteType.Level1) {
 					TryAddLevel1();
@@ -159,6 +161,7 @@ namespace TickZoom.MBTrading
 			lastAsk = pQuote.dAsk;
 			lastBidSize = pQuote.lBidSize;
 			lastAskSize = pQuote.lAskSize;
+	    	CheckSignalSync();
 			if( lastBid != lastTick.Bid || lastAsk != lastTick.Ask) {
 	        	CreateTick();
 	        	if( TryAddLevel1() ) {
@@ -188,6 +191,7 @@ namespace TickZoom.MBTrading
         	}
 			lastBid = level2Bids.LastPrice;
 			lastAsk = level2Asks.LastPrice;
+	    	CheckSignalSync();
         	if( Environment.TickCount > lastChangeTime + 30) {
         		if( level2Bids.HasChanged || level2Asks.HasChanged ) {
 	        		LogLevel2Change(false,TradeSide.Unknown,0,0);
@@ -296,12 +300,20 @@ namespace TickZoom.MBTrading
     		lock(signalLock) {
 
     			long size = (long) _size;
+				storedSize = size;
     			int elapsed = Environment.TickCount - ignoredTickCount;
-		    	if( m_account == null) {
+    			if( m_account == null ) {
 	    			if( ignoredTickCount == 0 || elapsed > 5000) {
 		    			orderLog.Notice( "Signal("+size+") storing. Account not loaded.");
 						isStoredSize = true;
-						storedSize = size;
+		    			ignoredTickCount = Environment.TickCount;
+    				}
+		    		return;
+	    		}
+    			if( LastAsk == 0D || LastBid == 0D) {
+	    			if( ignoredTickCount == 0 || elapsed > 5000) {
+		    			orderLog.Notice( "Signal("+size+") storing because LastBid = " + LastBid + " and LastAsk = " + LastAsk);
+						isStoredSize = true;
 		    			ignoredTickCount = Environment.TickCount;
     				}
 		    		return;
@@ -490,12 +502,16 @@ namespace TickZoom.MBTrading
 			    		orderLog.Notice("Order " + orderNum + ": Cancel Failed: " + bstrRetMsg);
 		    		}
 		    	}
-		    	if( isStoredSize) {
-		    		SubmitOrder(storedSize);
-		    		isStoredSize = false;
-		    	}
+		    	CheckSignalSync();
 	    	}
 	    	firstTime = false;
+	    }
+	    
+	    private void CheckSignalSync() {
+	    	if( isStoredSize && LastBid > 0 && LastAsk > 0) {
+	    		SubmitOrder(storedSize);
+	    		isStoredSize = false;
+	    	}
 	    }
 
 		bool firstHistory = true;
