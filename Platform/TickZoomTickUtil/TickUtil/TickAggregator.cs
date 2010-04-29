@@ -91,16 +91,16 @@ namespace TickZoom.TickUtil
 		}
 		
 		int countLog = 0;
-		private bool Process() {
+		private Yield Process() {
 			lock( taskLocker) {
-				if( isDisposed) return false;
+				if( isDisposed) return null;
 				if( !isProcessStarted) {
 					ProcessStartup();
 					isProcessStarted = false;
 				}
 				if( symbolQueues.Count == 0 ||
 				   !receiver.CanReceive(null)) {
-					return false;
+					return null;
 				}
 				int nextQueue = 0;
 	   			for( int i=1; i<symbolQueues.Count; i++) {
@@ -122,7 +122,7 @@ namespace TickZoom.TickUtil
 					inputQueue.Receive(ref tick);
 					inputQueue.NextTick = tick;
 					inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
-					return true;
+					return Process;
 				} catch( QueueException ex) {
 					if( ex.EntryType == EventType.EndHistorical) {
 						if( symbolQueues.Count <= 1) {
@@ -135,7 +135,7 @@ namespace TickZoom.TickUtil
 						throw new ApplicationException("Queue returned invalid entry type: " + ex.EntryType, ex);
 					}
 				}
-				return true;
+				return Process;
 			}
 		}
 		

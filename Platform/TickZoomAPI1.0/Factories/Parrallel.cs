@@ -28,13 +28,12 @@ using System;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of ThreadManager.
-	/// </summary>
+	public delegate Yield Yield();
+	
 	public interface ParallelStarter
 	{
 		void Once(object creator, Action once);
-		Task Loop(object creator, Func<bool> loop);
+		Task Loop(object creator, Yield loop);
 		void For(object creator, int start, int stop, Action<int> loop);
 		void While(object creator, Func<bool> loop);
 	}

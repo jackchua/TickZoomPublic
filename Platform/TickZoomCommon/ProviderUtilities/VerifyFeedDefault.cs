@@ -265,15 +265,15 @@ namespace TickZoom.Common
 			return count;
 		}
 
-		public bool TimeTheFeedTask()
+		public Yield TimeTheFeedTask()
 		{
 			lock(taskLocker) {
 				if( isDisposed) {
-					return false;
+					return null;
 				}
 				try {
 					if (!tickQueue.CanDequeue)
-						return false;
+						return null;
 					tickQueue.Dequeue(ref tickBinary);
 					tickIO.Inject(tickBinary);
 					if (debug && count < 5) {
@@ -287,11 +287,11 @@ namespace TickZoom.Common
 					if (count % 1000000 == 0) {
 						log.Notice("Read " + count + " ticks");
 					}
-					return true;
+					return TimeTheFeedTask;
 				} catch (QueueException ex) {
 					HandleQueueException(ex);
 				}
-				return false;
+				return null;
 			}
 		}
 

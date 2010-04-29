@@ -38,7 +38,7 @@ namespace TickZoom.Api
 		ReceiverState VerifyState(ReceiverState expectedState, SymbolInfo symbol, int timeout);
 		void StartTimeTheFeed();
 		int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds);
-		bool TimeTheFeedTask();
+		Yield TimeTheFeedTask();
 		TickQueue TickQueue { get; }
 		bool IsRealTime { get; }
 		TickIO LastTick { get; }

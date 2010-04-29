@@ -260,10 +260,10 @@ namespace TickZoom.TickUtil
    			tickIO.SetSymbol(lSymbol);
 		}
 		
-		private bool FileReader() {
+		private Yield FileReader() {
 			lock( taskLocker) {
 				if( isDisposed || !receiver.CanReceive(symbol)) {
-					return false;
+					return null;
 				}
 				try {
 		    		if( position < length && !CancelPending) {
@@ -281,7 +281,7 @@ namespace TickZoom.TickUtil
 		    			
 						if( IsAtEnd(tick)) {
 							FinishTask();
-							return false;
+							return null;
 		    			}
 		    
 		    			if( IsAtStart(tick)) {
@@ -313,16 +313,16 @@ namespace TickZoom.TickUtil
 						}
 					} else {
 						FinishTask();
-						return false;
+						return null;
 					}
 				} catch( ObjectDisposedException) {
 					FinishTask();
-					return false;
+					return null;
 				} catch( Exception ex) {
 					log.Warn( "Exception thrown in Reader class", ex);
 					throw;
 				}
-			    return true;
+			    return FileReader;
 			}
 		}
 		
