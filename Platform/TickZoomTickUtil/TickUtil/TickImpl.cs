@@ -866,7 +866,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public object ToPosition() {
-			return binary.UtcTime;
+			return new TimeStamp(binary.UtcTime).ToString();
 		}
 		
 		#if DEBUG
