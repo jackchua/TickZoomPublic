@@ -80,8 +80,8 @@ namespace TickZoom.TickUtil
 			return tickQueue.CanEnqueue;
 		}
 		
-		public void OnEvent(SymbolInfo symbo, int eventType, object eventDetail) {
-	    	if( isDisposed) return;
+		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+	    	if( isDisposed || !CanReceive(symbol)) return false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
@@ -112,9 +112,11 @@ namespace TickZoom.TickUtil
 					default:
 						break;
 				}
+	    		return true;
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
+	    	return false;
 		}
 		
 	    public void Receive(ref TickBinary tick) {

@@ -32,8 +32,7 @@ namespace TickZoom.Api
 	public interface AsyncReceiver : Receiver, IDisposable {
 	}
 	public interface Receiver : IDisposable {
-		void OnEvent(SymbolInfo symbol, int eventType, object eventDetail);
-	    ReceiverState OnGetReceiverState(SymbolInfo symbol);
+		bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail);
 	    bool CanReceive(SymbolInfo symbol);
 	}
 	

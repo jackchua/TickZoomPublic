@@ -55,7 +55,8 @@ namespace TickZoom.TickUtil
 			return readQueue.CanEnqueue;
 		}
 		
-		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			if( !CanReceive(symbol)) return false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
@@ -86,9 +87,11 @@ namespace TickZoom.TickUtil
 					default:
 						break;
 				}
+				return true;
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
+			return false;
 		}
 		
 		public TickQueue ReadQueue {

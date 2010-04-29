@@ -124,14 +124,21 @@ namespace MiscTest
 		}
 		
 		private void DeleteFiles() {
+			int count = 0;
 			while( true) {
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
 		 			File.Delete( appData + @"\TestServerCache\ESZ9_Tick.tck");
 		 			File.Delete( appData + @"\TestServerCache\IBM_Tick.tck");
 		 			File.Delete( appData + @"\TestServerCache\GBPUSD_Tick.tck");
-					break;
-				} catch( Exception) {
+					return;
+				} catch( Exception ex) {
+					count ++;
+					if( count > 100) {
+						throw;
+					} else {
+						Thread.Sleep(1);
+					}
 				}
 			}
 		}
@@ -158,23 +165,22 @@ namespace MiscTest
 				AutoUpdate auto = new AutoUpdate();
 				string hash1 = auto.GetMD5HashFromFile(compareFile1);
 				string hash2 = auto.GetMD5HashFromFile(compareFile2);
-				TickReader reader1 = new TickReader();
-				reader1.Initialize(compareFile1,form.TxtSymbol.Text);
-				TickReader reader2 = new TickReader();
-				reader2.Initialize(compareFile2,form.TxtSymbol.Text);
-				TickBinary tick1 = new TickBinary();
-				TickBinary tick2 = new TickBinary();
-				try {
-					while(true) {
-						reader1.ReadQueue.Dequeue(ref tick1);
-						reader2.ReadQueue.Dequeue(ref tick2);
-						Assert.AreEqual(tick1,tick2);
+				using ( TickReader reader1 = new TickReader())
+				using ( TickReader reader2 = new TickReader()) {
+					reader1.Initialize(compareFile1,form.TxtSymbol.Text);
+					reader2.Initialize(compareFile2,form.TxtSymbol.Text);
+					TickBinary tick1 = new TickBinary();
+					TickBinary tick2 = new TickBinary();
+					try {
+						while(true) {
+							reader1.ReadQueue.Dequeue(ref tick1);
+							reader2.ReadQueue.Dequeue(ref tick2);
+							Assert.AreEqual(new TimeStamp(tick1.UtcTime),new TimeStamp(tick2.UtcTime));
+						}
+					} catch( QueueException ex) {
+						Assert.AreEqual(ex.EntryType,EventType.EndHistorical);
 					}
-				} catch( QueueException ex) {
-					Assert.AreEqual(ex.EntryType,EventType.EndHistorical);
 				}
-				reader1.Dispose();
-				reader2.Dispose();
 			}
 		}
 	}

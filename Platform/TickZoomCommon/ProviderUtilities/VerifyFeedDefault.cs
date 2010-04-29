@@ -400,7 +400,8 @@ namespace TickZoom.Common
 			customEventDetail = eventDetail;
 		}
 		
-		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			if( isDisposed || !CanReceive(symbol)) return false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
@@ -437,9 +438,11 @@ namespace TickZoom.Common
 			    		OnCustomEvent(symbol,eventType,eventDetail);
 			    		break;
 				}
+				return true;
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
+			return false;
 		}
 		
 		public TickIO LastTick {
