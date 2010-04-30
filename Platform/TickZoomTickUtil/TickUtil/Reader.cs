@@ -282,13 +282,12 @@ namespace TickZoom.TickUtil
 						}
 						
 		    			if( maxCount > 0 && count > maxCount) {
-						if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
-							FinishTask();
+							if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
+							return SendFinish;
 		    			}
 		    			
 						if( IsAtEnd(tick)) {
-							FinishTask();
-							return null;
+							return SendFinish;
 		    			}
 		    
 		    			if( IsAtStart(tick)) {
@@ -309,12 +308,10 @@ namespace TickZoom.TickUtil
 						}
 						
 					} else {
-						FinishTask();
-						return null;
+						return SendFinish;
 					}
 				} catch( ObjectDisposedException) {
-					FinishTask();
-					return null;
+					return SendFinish;
 				}
 			    return FileReader;
 			}
@@ -339,7 +336,15 @@ namespace TickZoom.TickUtil
 			}
 		}
 		
-		private bool FinishTask() {
+		private Yield SendFinish() {
+			if( count > 0 && !receiver.OnEvent(symbol,(int)EventType.EndHistorical,null)) {
+				return SendFinish;
+			} else {
+				return FinishTask;
+			}
+		}
+		
+		private Yield FinishTask() {
 			try {
 				if( !quietMode && isDataRead ) {
 					LogInfo("Processing ended for " + symbol + " at " + tickIO.ToPosition());
@@ -354,9 +359,6 @@ namespace TickZoom.TickUtil
 					log.Debug( "Exception on progressCallback: " + ex.Message);
 				}
 				if( debug) log.Debug("calling receiver.OnEvent(symbol,(int)EventType.EndHistorical)");
-				if( count > 0) {
-					receiver.OnEvent(symbol,(int)EventType.EndHistorical,null);
-				}
     		} catch ( ThreadAbortException) {
 		
     		} catch ( FileNotFoundException ex) {
@@ -370,7 +372,7 @@ namespace TickZoom.TickUtil
 					dataIn.Close();
 				}
     		}
-			return true;
+			return null;
 		}
 		
 	    public void Dispose() 

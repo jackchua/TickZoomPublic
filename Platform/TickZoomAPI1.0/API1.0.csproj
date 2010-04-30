@@ -83,6 +83,7 @@
     <Compile Include="Classes\TickBinary.cs" />
     <Compile Include="Classes\TimeStamp.cs" />
     <Compile Include="Classes\TaskLock.cs" />
+    <Compile Include="Classes\TimeSyncDetail.cs" />
     <Compile Include="ClientInterfaces\DrawingInterface.cs" />
     <Compile Include="ClientInterfaces\EventType.cs" />
     <Compile Include="ClientInterfaces\IndicatorInterface.cs" />
@@ -149,7 +150,6 @@
     <Compile Include="EngineInterfaces\Ticks.cs" />
     <Compile Include="EngineInterfaces\TimeAndSales.cs" />
     <Compile Include="EngineInterfaces\Times.cs" />
-    <Compile Include="EngineInterfaces\TimeSyncDetail.cs" />
     <Compile Include="EngineInterfaces\TimeSyncGenerator.cs" />
     <Compile Include="Enums\Audio.cs" />
     <Compile Include="Enums\ChartType.cs" />
