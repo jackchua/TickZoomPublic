@@ -174,6 +174,10 @@ namespace TickZoom.Common
 				ReportProgress( "Optimizing...", 0, totalTasks);
 
 				GetEngineResults();
+
+				WriteEngineResults(loader,engineIterations);
+				
+				engineIterations.Clear();				
 				
 				ReportProgress( "Optimizing Complete", totalTasks-tasksRemaining, totalTasks);
 				
@@ -221,6 +225,10 @@ namespace TickZoom.Common
 
 			GetEngineResults();
 			
+			WriteEngineResults(loader,engineIterations);
+			
+			engineIterations.Clear();				
+			
 			ReportProgress( "Optimizing Complete", totalTasks-tasksRemaining, totalTasks);
 			
 			#if CLRPROFILER
@@ -247,7 +255,6 @@ namespace TickZoom.Common
 		        --tasksRemaining;
 				ReportProgress( "Optimizing...", totalTasks-tasksRemaining, totalTasks);
 			}
-			engineIterations.Clear();
 		}
 	    
 		static Random random = new Random();
@@ -292,32 +299,33 @@ namespace TickZoom.Common
 		
 		public void ProcessHistorical(Chromosome chromosome) {
 	    	loader.OnClear();
-			
-			TickEngine engine = Factory.Engine.TickEngine;
-			engine.Providers = SetupProviders(true,true);
-			engine.SymbolInfo = ProjectProperties.Starter.SymbolProperties;
-			engine.BackgroundWorker = BackgroundWorker;
-			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
-			engine.RunMode = RunMode.Historical;
 			loader.OnLoad(ProjectProperties);
+			
+			if( !SetOptimizeValues(loader)) {
+				throw new ApplicationException("Error, setting optimize variables.");
+			}
+	    			
+			TickEngine engine = Factory.Engine.TickEngine;
 			engine.Model = loader.TopModel;
+			engine.SymbolInfo = ProjectProperties.Starter.SymbolProperties;
+
+			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
 			engine.EnableTickFilter = ProjectProperties.Engine.EnableTickFilter;
+			
+			engine.Providers = SetupProviders(true,true);
+			engine.BackgroundWorker = BackgroundWorker;
+			engine.RunMode = RunMode.Historical;
 			engine.StartTime = ProjectProperties.Starter.StartTime;
+			engine.EndTime = ProjectProperties.Starter.EndTime;
 	
 			if(CancelPending) return;
 			
-			// Setup optimize vars
-			// First, get all the optimization values for logging.
-			Dictionary<string, object> optimizeValues = new Dictionary<string, object>();
-			for( int i=0; i<loader.Variables.Count; i++) {
-				ModelProperty property = loader.Variables[i];
-				optimizeValues.Add(property.Name,property.Value);
-			}
-			// Then set them for logging separately to optimization reports.
-			engine.ReportWriter.OptimizeValues = optimizeValues;
-			
+			engine.BackgroundWorker = BackgroundWorker;
 			engine.QuietMode = true;
-			engine.CreateChartCallback = CreateChartCallback;
+			
+			// Then set them for logging separately to optimization reports.
+			engine.ReportWriter.OptimizeValues = OptimizeValues;
+			
 			engine.QueueTask();
 			engineIterations.Add(engine);
 		}

@@ -33,7 +33,7 @@ namespace TickZoom.Api
 	}
 	public interface Receiver : IDisposable {
 		bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail);
-	    bool CanReceive(SymbolInfo symbol);
+//	    bool CanReceive(SymbolInfo symbol);
 	}
 	
 	public interface Serializable {

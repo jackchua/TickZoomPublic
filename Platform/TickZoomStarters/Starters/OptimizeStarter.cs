@@ -45,15 +45,9 @@ namespace TickZoom.Common
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		int totalTasks=0;
 		ModelLoaderInterface loader;
-	    string storageFolder;
 	    int tasksRemaining;
-	    string fileName;
 	    
 	    public OptimizeStarter() {
-    		storageFolder = Factory.Settings["AppDataFolder"];
-   			if( storageFolder == null) {
-       			throw new ApplicationException( "Must set AppDataFolder property in app.config");
-   			}
 	    }
 	    
 		public override void Run(ModelInterface model)
@@ -64,14 +58,13 @@ namespace TickZoom.Common
 		List<TickEngine> engineIterations;
 		public override void Run(ModelLoaderInterface loader)
 		{
-    		fileName = storageFolder + @"\Statistics\optimizeResults.csv";
     		try {
     			if( loader.OptimizeOutput == null) {
-		    		Directory.CreateDirectory( Path.GetDirectoryName(fileName));
-		    		File.Delete(fileName);
+		    		Directory.CreateDirectory( Path.GetDirectoryName(FileName));
+		    		File.Delete(FileName);
     			}
     		} catch( Exception ex) {
-    			log.Error("Error while creating directory and deleting '" + fileName + "'.",ex);
+    			log.Error("Error while creating directory and deleting '" + FileName + "'.",ex);
     			return;
     		}
 			this.loader = loader;
@@ -96,7 +89,7 @@ namespace TickZoom.Common
 
 			GetEngineResults();
 			
-			WriteEngineResults();
+			WriteEngineResults(loader,engineIterations);
 
 			engineIterations.Clear();
 
@@ -117,30 +110,6 @@ namespace TickZoom.Common
 		        --tasksRemaining;
 				ReportProgress( "Optimizing...", totalTasks-tasksRemaining, totalTasks);
 			}
-		}
-
-		private void WriteEngineResults() {
-    		try {
-    			if( loader.OptimizeOutput == null) {
-					loader.OptimizeOutput = new FileStream(fileName,FileMode.Append);
-    			}
-    			StreamWriter fwriter = new StreamWriter(loader.OptimizeOutput);
-				TickEngine engine = engineIterations[0];
-				string header = engine.OptimizeHeader;
-				if( header != null && header.Length > 0) {
-					fwriter.WriteLine(header);
-				}
-				for( int i=0; i<engineIterations.Count; i++) {
-					engine = engineIterations[i];
-					string stats = engine.OptimizeResult;
-					if( stats != null && stats.Length > 0) {
-						fwriter.WriteLine(stats);
-					}
-				}
-	       		fwriter.Close();
-    		} catch( Exception ex) {
-    			log.Error("ERROR: Problem writing optimizer results.", ex);
-    		}
 		}
 
 		private bool CancelPending {
@@ -171,13 +140,7 @@ namespace TickZoom.Common
 	    	loader.OnClear();
 			loader.OnLoad(ProjectProperties);
 			
-			// Then set them for logging separately to optimization reports.
-			Dictionary<string,object> optimizeValues = new Dictionary<string,object>();
-			for( int i = 0; i < loader.Variables.Count; i++) {
-				optimizeValues[loader.Variables[i].Name] = loader.Variables[i].Value;
-			}
-			
-			if( !SetOptimizeValues(optimizeValues)) {
+			if( !SetOptimizeValues(loader)) {
 				throw new ApplicationException("Error, setting optimize variables.");
 			}
 	    			
@@ -201,119 +164,13 @@ namespace TickZoom.Common
 			engine.BackgroundWorker = BackgroundWorker;
 			engine.QuietMode = true;
 	
-			if(CancelPending) return;
-			
-			engine.ReportWriter.OptimizeValues = optimizeValues;
+			engine.ReportWriter.OptimizeValues = OptimizeValues;
 			
 			totalTasks++;
 			engine.OptimizePass = totalTasks;
 			engine.QueueTask();
 			engineIterations.Add(engine);
 		}
-		
-	    internal bool SetOptimizeValues(Dictionary<string,object> optimizeValues) {
-	    	bool retVal = true;
-	    	foreach( KeyValuePair<string, object> kvp in optimizeValues) {
-	    		string[] namePairs = kvp.Key.Split('.');
-	    		if( namePairs.Length < 2) {
-	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
-	    			retVal = false;
-	    			continue;
-	    		}
-	    		string strategyName = namePairs[0];
-	    		StrategyInterface strategy = null;
-	    		foreach( StrategyInterface tempStrategy in GetStrategyList(loader.TopModel.Chain.Tail)) {
-	    			if( tempStrategy.Name == strategyName) {
-	    				strategy = tempStrategy;
-	    				break;
-	    			}
-	    		}
-	    		if( strategy == null) {
-	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
-	    			retVal = false;
-	    			continue;
-	    		}
-    			string propertyName = namePairs[1];
-				PropertyDescriptorCollection props = TypeDescriptor.GetProperties(strategy);
-				PropertyDescriptor property = null;
-				for( int i = 0; i < props.Count; i++) {
-					PropertyDescriptor tempProperty = props[i];
-					if( tempProperty.Name == propertyName) {
-						property = tempProperty;
-						break;
-					}
-		    	}
-				if( property == null) {
-	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
-	    			retVal = false;
-	    			continue;
-				}
-				if( namePairs.Length == 2) {
-					if( !SetProperty(strategy,property,kvp.Value)) {
-						log.Error("Sorry, the value '" + kvp.Value + "' isn't valid for optimizer variable '" + kvp.Key + "'.");
-		    			retVal = false;
-		    			continue;
-					}
-				} else if( namePairs.Length == 3) {
-					StrategyInterceptor strategySupport = property.GetValue(strategy) as StrategyInterceptor;
-					if( strategySupport == null) {
-		    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
-		    			retVal = false;
-		    			continue;
-					}
-					string strategySupportName = namePairs[1];
-					propertyName = namePairs[2];
-					props = TypeDescriptor.GetProperties(strategySupport);
-					property = null;
-					for( int i = 0; i < props.Count; i++) {
-						PropertyDescriptor tempProperty = props[i];
-						if( tempProperty.Name == propertyName) {
-							property = tempProperty;
-							break;
-						}
-			    	}
-					if( property == null) {
-		    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
-		    			retVal = false;
-		    			continue;
-					}
-					if( !SetProperty(strategySupport,property,kvp.Value)) {
-						log.Error("Sorry, the value '" + kvp.Value + "' isn't valid for optimizer variable '" + kvp.Key + "'.");
-		    			retVal = false;
-		    			continue;
-					}
-				}
-	    	}
-	    	return retVal;
-	    }
 
-		private bool SetProperty( object target, PropertyDescriptor property, object value) {
-			Type type = property.PropertyType;
-			TypeConverter convert = TypeDescriptor.GetConverter(type);
-	        if (!convert.IsValid(value)) {
-				return false;
-	        }
-			object convertedValue = convert.ConvertFrom(value);
-			property.SetValue(target,convertedValue);
-			return true;
-		}
-		
-   		internal IEnumerable<StrategyInterface> GetStrategyList(Chain chain) {
-   			StrategyInterface currentStrategy = chain.Model as StrategyInterface;
-   			if( currentStrategy != null) {
-   				yield return currentStrategy;
-   			}
-   			foreach( Chain tempChain in chain.Dependencies) {
-   				foreach( StrategyInterface strategy in GetStrategyList(tempChain.Tail)) {
-   					yield return strategy;
-   				}
-   			}
-   			if( chain.Previous.Model != null) {
-   				foreach( StrategyInterface strategy in GetStrategyList(chain.Previous)) {
-   					yield return strategy;
-   				}
-   			}
-   		}
-		
 	}
 }

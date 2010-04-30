@@ -142,12 +142,12 @@ namespace TickZoom.TickUtil
         public void Stop(Receiver receiver)
         {
             if (debug) log.Debug("Stop(" + receiver + ")");
-			if( receiver != null) {
-            	if( !receiver.CanReceive(symbol)) {
-            		log.Warn("Can't receive Terminate message");
-            	}
-				receiver.OnEvent(null,(int)EventType.Terminate,null);
-			}
+//			if( receiver != null) {
+//            	if( !receiver.CanReceive(symbol)) {
+//            		log.Warn("Can't receive Terminate message");
+//            	}
+//				receiver.OnEvent(null,(int)EventType.Terminate,null);
+//			}
             Dispose();
         }
 		
@@ -262,9 +262,7 @@ namespace TickZoom.TickUtil
 		
 		private Yield FileReader() {
 			lock( taskLocker) {
-				if( isDisposed || !receiver.CanReceive(symbol)) {
-					return null;
-				}
+				if( isDisposed ) return null;
 				try {
 		    		if( position < length && !CancelPending) {
 						ReadTick();
@@ -274,6 +272,15 @@ namespace TickZoom.TickUtil
 		    			tick = tickIO.Extract();
 						isDataRead = true;
 		    			
+						if( position > nextUpdate) {
+							try {
+					    		progressCallback("Loading bytes...", position, length);
+							} catch( Exception ex) {
+								log.Debug( "Exception on progressCallback: " + ex.Message);
+							}
+					    	nextUpdate = position + progressDivisor;
+						}
+						
 		    			if( maxCount > 0 && count > maxCount) {
 						if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
 							FinishTask();
@@ -285,14 +292,6 @@ namespace TickZoom.TickUtil
 		    			}
 		    
 		    			if( IsAtStart(tick)) {
-			    			if( isFirstTick) {
-								receiver.OnEvent(symbol,(int)EventType.StartHistorical,null);
-								if( !quietMode) {
-									LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
-								}
-			    				isFirstTick = false;
-			    			}
-					
 		    				count++;
 		    				if( debug && count<5) {
 		    					log.Debug("Read a tick " + tickIO);
@@ -300,17 +299,15 @@ namespace TickZoom.TickUtil
 		    					log.Trace("Read a tick " + tickIO);
 		    				}
 		    				tick.Symbol = symbol.BinaryIdentifier;
-		    				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
+		    				
+			    			if( isFirstTick) {
+			    				isFirstTick = false;
+			    				return StartEvent;
+			    			}
+							
+		    				return TickEvent;
 						}
 						
-						if( position > nextUpdate) {
-							try {
-					    		progressCallback("Loading bytes...", position, length);
-							} catch( Exception ex) {
-								log.Debug( "Exception on progressCallback: " + ex.Message);
-							}
-					    	nextUpdate = position + progressDivisor;
-						}
 					} else {
 						FinishTask();
 						return null;
@@ -318,11 +315,27 @@ namespace TickZoom.TickUtil
 				} catch( ObjectDisposedException) {
 					FinishTask();
 					return null;
-				} catch( Exception ex) {
-					log.Warn( "Exception thrown in Reader class", ex);
-					throw;
 				}
 			    return FileReader;
+			}
+		}
+		
+		private Yield StartEvent() {
+			if( !receiver.OnEvent(symbol,(int)EventType.StartHistorical,null)) {
+				return StartEvent;
+			} else {
+				if( !quietMode) {
+					LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
+				}
+				return TickEvent;
+			}
+		}
+		
+		private Yield TickEvent() {
+			if( !receiver.OnEvent(symbol,(int)EventType.Tick,tick)) {
+				return TickEvent;
+			} else {
+				return FileReader;
 			}
 		}
 		

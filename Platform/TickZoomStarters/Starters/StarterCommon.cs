@@ -61,9 +61,15 @@ namespace TickZoom.Common
 	    ProjectProperties projectProperties = new ProjectPropertiesCommon();
 	    string projectFile = Factory.Settings["AppDataFolder"] + @"\portfolio.tzproj";
 		private List<Provider> tickProviders = new List<Provider>();
+	    string fileName;
+	    string storageFolder;
 		
 		public StarterCommon() : this(true) {
-			
+    		storageFolder = Factory.Settings["AppDataFolder"];
+   			if( storageFolder == null) {
+       			throw new ApplicationException( "Must set AppDataFolder property in app.config");
+   			}
+    		fileName = storageFolder + @"\Statistics\optimizeResults.csv";
 		}
 		
 		public StarterCommon(bool releaseEngineCache) {
@@ -168,6 +174,146 @@ namespace TickZoom.Common
 			Run( model);
 		}
 		
+		Dictionary<string,object> optimizeValues;
+		
+		public Dictionary<string,object> OptimizeValues {
+			get { return optimizeValues; }
+		}
+		
+	    public bool SetOptimizeValues(ModelLoaderInterface loader) {
+			// Then set them for logging separately to optimization reports.
+			optimizeValues = new Dictionary<string,object>();
+			for( int i = 0; i < loader.Variables.Count; i++) {
+				optimizeValues[loader.Variables[i].Name] = loader.Variables[i].Value;
+			}
+			
+	    	bool retVal = true;
+	    	foreach( KeyValuePair<string, object> kvp in optimizeValues) {
+	    		string[] namePairs = kvp.Key.Split('.');
+	    		if( namePairs.Length < 2) {
+	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
+	    			retVal = false;
+	    			continue;
+	    		}
+	    		string strategyName = namePairs[0];
+	    		StrategyInterface strategy = null;
+	    		foreach( StrategyInterface tempStrategy in GetStrategyList(loader.TopModel.Chain.Tail)) {
+	    			if( tempStrategy.Name == strategyName) {
+	    				strategy = tempStrategy;
+	    				break;
+	    			}
+	    		}
+	    		if( strategy == null) {
+	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
+	    			retVal = false;
+	    			continue;
+	    		}
+    			string propertyName = namePairs[1];
+				PropertyDescriptorCollection props = TypeDescriptor.GetProperties(strategy);
+				PropertyDescriptor property = null;
+				for( int i = 0; i < props.Count; i++) {
+					PropertyDescriptor tempProperty = props[i];
+					if( tempProperty.Name == propertyName) {
+						property = tempProperty;
+						break;
+					}
+		    	}
+				if( property == null) {
+	    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
+	    			retVal = false;
+	    			continue;
+				}
+				if( namePairs.Length == 2) {
+					if( !SetProperty(strategy,property,kvp.Value)) {
+						log.Error("Sorry, the value '" + kvp.Value + "' isn't valid for optimizer variable '" + kvp.Key + "'.");
+		    			retVal = false;
+		    			continue;
+					}
+				} else if( namePairs.Length == 3) {
+					StrategyInterceptor strategySupport = property.GetValue(strategy) as StrategyInterceptor;
+					if( strategySupport == null) {
+		    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
+		    			retVal = false;
+		    			continue;
+					}
+					string strategySupportName = namePairs[1];
+					propertyName = namePairs[2];
+					props = TypeDescriptor.GetProperties(strategySupport);
+					property = null;
+					for( int i = 0; i < props.Count; i++) {
+						PropertyDescriptor tempProperty = props[i];
+						if( tempProperty.Name == propertyName) {
+							property = tempProperty;
+							break;
+						}
+			    	}
+					if( property == null) {
+		    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
+		    			retVal = false;
+		    			continue;
+					}
+					if( !SetProperty(strategySupport,property,kvp.Value)) {
+						log.Error("Sorry, the value '" + kvp.Value + "' isn't valid for optimizer variable '" + kvp.Key + "'.");
+		    			retVal = false;
+		    			continue;
+					}
+				}
+	    	}
+	    	return retVal;
+	    }
+		
+		private bool SetProperty( object target, PropertyDescriptor property, object value) {
+			Type type = property.PropertyType;
+			TypeConverter convert = TypeDescriptor.GetConverter(type);
+	        if (!convert.IsValid(value)) {
+				return false;
+	        }
+			object convertedValue = convert.ConvertFrom(value);
+			property.SetValue(target,convertedValue);
+			return true;
+		}
+		
+   		internal IEnumerable<StrategyInterface> GetStrategyList(Chain chain) {
+   			StrategyInterface currentStrategy = chain.Model as StrategyInterface;
+   			if( currentStrategy != null) {
+   				yield return currentStrategy;
+   			}
+   			foreach( Chain tempChain in chain.Dependencies) {
+   				foreach( StrategyInterface strategy in GetStrategyList(tempChain.Tail)) {
+   					yield return strategy;
+   				}
+   			}
+   			if( chain.Previous.Model != null) {
+   				foreach( StrategyInterface strategy in GetStrategyList(chain.Previous)) {
+   					yield return strategy;
+   				}
+   			}
+   		}
+		
+		public void WriteEngineResults(ModelLoaderInterface loader, List<TickEngine> engines) {
+    		try {
+				loader.OptimizeOutput = new FileStream(fileName,FileMode.Append);
+				using( StreamWriter fwriter = new StreamWriter(loader.OptimizeOutput)) {
+					if( engines.Count > 0) {
+						TickEngine engine = engines[0];
+						string header = engine.OptimizeHeader;
+						if( header != null && header.Length > 0) {
+							fwriter.WriteLine(header);
+						}
+						for( int i=0; i<engines.Count; i++) {
+							engine = engines[i];
+							string stats = engine.OptimizeResult;
+							if( stats != null && stats.Length > 0) {
+								fwriter.WriteLine(stats);
+							}
+						}
+					}
+				}
+    		} catch( Exception ex) {
+    			log.Error("ERROR: Problem writing optimizer results.", ex);
+    		}
+		}
+		
 		public ShowChartCallback ShowChartCallback {
 			get { return showChartCallback; }
 			set { showChartCallback = value; }
@@ -225,5 +371,10 @@ namespace TickZoom.Common
 		
 		public abstract void Wait();
 		
+	    
+		public string FileName {
+			get { return fileName; }
+			set { fileName = value; }
+		}
 	}
 }

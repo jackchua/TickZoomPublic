@@ -91,6 +91,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		int countLog = 0;
+		int nextQueue = 0;
 		private Yield Process() {
 			lock( taskLocker) {
 				if( isDisposed) return null;
@@ -98,11 +99,10 @@ namespace TickZoom.TickUtil
 					ProcessStartup();
 					isProcessStarted = false;
 				}
-				if( symbolQueues.Count == 0 ||
-				   !receiver.CanReceive(null)) {
+				if( symbolQueues.Count == 0) {
 					return null;
 				}
-				int nextQueue = 0;
+				nextQueue = 0;
 	   			for( int i=1; i<symbolQueues.Count; i++) {
 					if( symbolQueues[i].NextTick.UtcTime < symbolQueues[nextQueue].NextTick.UtcTime ) {
 		   				nextQueue = i;
@@ -115,8 +115,15 @@ namespace TickZoom.TickUtil
 				} else if( trace) {
 					log.Trace("Queuing tick with symbol=" + tick.Symbol + ", " + tick);
 				}
-				SymbolInfo symbol = Factory.Symbol.LookupSymbol(tick.Symbol);
-				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
+				return SendTick;
+			}
+		}
+		
+		private Yield SendTick() {
+			SymbolInfo symbol = Factory.Symbol.LookupSymbol(tick.Symbol);
+			if( !receiver.OnEvent(symbol,(int)EventType.Tick,tick)) {
+				return SendTick;
+			} else {
 				try {
 					SymbolQueue inputQueue = symbolQueues[nextQueue];
 					inputQueue.Receive(ref tick);
