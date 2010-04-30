@@ -111,14 +111,14 @@ namespace MiscTest
 				form.DefaultBox.Text = "10";
 				form.DefaultCombo.Text = "Tick";
 				form.RealTimeButtonClick(null,null);
-				WaitComplete(30, () => { return form.PortfolioDocs.Count == 2 &&
+				WaitComplete(30000, () => { return form.PortfolioDocs.Count == 2 &&
 				             		form.PortfolioDocs[0].Visible &&
 				             		form.PortfolioDocs[1].Visible; } );
 				Assert.AreEqual(2,form.PortfolioDocs.Count,"Charts");
 				Assert.IsTrue(form.PortfolioDocs[0].Visible &&
 				             		form.PortfolioDocs[1].Visible,"Charts Visible");
 				form.btnStop_Click(null,null);
-				WaitComplete(10, () => { return !form.ProcessWorker.IsBusy; } );
+				WaitComplete(10000, () => { return !form.ProcessWorker.IsBusy; } );
 				Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 			}
 		}

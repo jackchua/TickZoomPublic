@@ -122,15 +122,23 @@ namespace TickZoom.Common
 			tickImpl.SetTime( new TimeStamp(2000,1,1));
 			tickImpl.SetQuote(100D, 100D);
 			TickBinary tickBinary = tickImpl.Extract();
-			receiver.OnEvent(symbol,(int)EventType.StartHistorical,symbol);
-			receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary );
+			if( !receiver.OnEvent(symbol,(int)EventType.StartHistorical,symbol)) {
+				throw new ApplicationException("Can't send StartHistorical.");
+			}
+			if( !receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary )) {
+				throw new ApplicationException("Can't send tick.");
+			}
 			tickImpl.Initialize();
 			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickImpl.SetTime( new TimeStamp(2000,1,2));
 			tickImpl.SetQuote(101D, 101D);
 			tickBinary = tickImpl.Extract();
-			receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary );
-			receiver.OnEvent(symbol,(int)EventType.EndHistorical,symbol);
+			if( !receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary )) {
+				throw new ApplicationException("Can't send tick.");
+			}
+			if( !receiver.OnEvent(symbol,(int)EventType.EndHistorical,symbol)) {
+				throw new ApplicationException("Can't send EndHistorical.");
+			}
 		}
 		
 		public void StopSymbol(Receiver receiver, SymbolInfo symbol)

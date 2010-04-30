@@ -87,7 +87,9 @@ namespace TickZoom.TickUtil
 				symbolQueue.NextTick.Symbol = symbolQueue.Symbol.BinaryIdentifier;
 				if( debug) log.Debug("Initial tick has symbol '" + symbolQueue.NextTick.Symbol +"'");
 	   		}
-			receiver.OnEvent(null,(int)EventType.StartRealTime,null);
+			if( !receiver.OnEvent(null,(int)EventType.StartRealTime,null)) {
+				throw new ApplicationException("Can't send StartRealTime.");
+			}
 		}
 		
 		int countLog = 0;
@@ -133,7 +135,9 @@ namespace TickZoom.TickUtil
 				} catch( QueueException ex) {
 					if( ex.EntryType == EventType.EndHistorical) {
 						if( symbolQueues.Count <= 1) {
-							receiver.OnEvent(null,(int)EventType.Terminate,null);
+							if( !receiver.OnEvent(null,(int)EventType.Terminate,null)) {
+								throw new ApplicationException("Can't send Terminate.");
+							}
 							Factory.Parallel.CurrentTask.Stop();
 						} else {
 							symbolQueues.RemoveAt(nextQueue);
