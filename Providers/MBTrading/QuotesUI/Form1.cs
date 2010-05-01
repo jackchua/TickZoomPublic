@@ -487,7 +487,7 @@ namespace MBTest
     public class StubReceiver : Receiver {
     	
     	public bool CanReceive(SymbolInfo symbol) {
-			return true;;
+			return true;
 		}
     	
 		public ReceiverState ReceiverState {
@@ -540,8 +540,8 @@ namespace MBTest
 			return ReceiverState.Ready;
 		}
 		
-		public void OnEvent( SymbolInfo symbol, int eventType, object eventDetail) {
-			
+		public bool OnEvent( SymbolInfo symbol, int eventType, object eventDetail) {
+			return true;
 		}
 		
 		private bool isDisposed;

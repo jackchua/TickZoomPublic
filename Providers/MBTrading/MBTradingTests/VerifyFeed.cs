@@ -120,9 +120,9 @@ namespace TickZoom.Test
 			return elapsed/1000;
 		}		
 	
-		public bool TimeTheFeedTask() {
+		public Yield TimeTheFeedTask() {
 			try {
-       			if( !tickQueue.CanDequeue) return false;
+       			if( !tickQueue.CanDequeue) return null;
             	tickQueue.Dequeue(ref tickBinary);
        			tick.Inject(tickBinary);
 				if( debug && count < 5)
@@ -134,98 +134,109 @@ namespace TickZoom.Test
 				if( count%1000000 == 0) {
 					log.Notice("Read " + count + " ticks");
 				}
-				return true;
+				return TimeTheFeedTask;
            	} catch( QueueException ex) {
        			if( EventType.EndHistorical != ex.EntryType) {
        				throw new ApplicationException( "Unexpected QueueException: " + ex.EntryType);
        			}
             	log.Debug("Queue Terminated");
             	Factory.Parallel.CurrentTask.Stop();
-            	return false;
+            	return TimeTheFeedTask;
         	}
+       		return null;
 		}
        	
-		public void OnRealTime(SymbolInfo symbol) {
+		public bool OnRealTime(SymbolInfo symbol) {
+       		return true;
 		}
 		
-		public void OnHistorical(SymbolInfo symbol) {
+		public bool OnHistorical(SymbolInfo symbol) {
+       		return true;
 		}
 		
        	public bool CanReceive( SymbolInfo symbol) {
        		return tickQueue != null && tickQueue.CanEnqueue;
 		}
 	 		
-		public void OnSend(ref TickBinary o)
+		public bool OnSend(ref TickBinary o)
 		{
 			try {
 				tickQueue.EnQueue(ref o);
 			} catch( QueueException) {
 				// Queue already terminated.
 			}
+			return true;
 		}
 
-	    public void OnPositionChange(LogicalFillBinary fill)
+	    public bool OnPositionChange(LogicalFillBinary fill)
 	    {
 	        throw new NotImplementedException();
 	    }
 
-	    public void OnStop()
+	    public bool OnStop()
 		{
 			try {
 	    		tickQueue.EnQueue(EventType.Terminate, (SymbolInfo) null);
 			} catch( QueueException) {
 				// Queue already terminated.
 			}
+	    	return true;
 		}
 		
-	    public void OnError( string error) {
+	    public bool OnError( string error) {
 	    	log.Error( error);
 	    	tickQueue.Terminate();
+	    	return true;
 	    }
-		public void Close() {
+		public bool Close() {
 			tickQueue.Terminate();
+			return true;
 		}
 		
-		public void OnEndHistorical(SymbolInfo symbol)
+		public bool OnEndHistorical(SymbolInfo symbol)
 		{
 			tickQueue.EnQueue(EventType.EndHistorical, symbol);
+			return true;
 		}
 		
-		public void OnEndRealTime(SymbolInfo symbol)
+		public bool OnEndRealTime(SymbolInfo symbol)
 		{
        		try {
 				tickQueue.EnQueue(EventType.EndRealTime, symbol);
        		} catch ( QueueException) {
        			// Queue was already ended.
        		}
+			return true;
 		}
-		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			if( isDisposed) return false;
+			bool result = false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
 						TickBinary binary = (TickBinary) eventDetail;
-						OnSend(ref binary);
+						result = OnSend(ref binary);
 						break;
 					case EventType.EndHistorical:
-						OnEndHistorical(symbol);
+						result = OnEndHistorical(symbol);
 						break;
 					case EventType.StartRealTime:
-						OnRealTime(symbol);
+						result = OnRealTime(symbol);
 						break;
 					case EventType.StartHistorical:
-						OnHistorical(symbol);
+						result = OnHistorical(symbol);
 						break;
 					case EventType.EndRealTime:
-						OnEndRealTime(symbol);
+						result = OnEndRealTime(symbol);
 						break;
 					case EventType.Error:
-						OnError((string)eventDetail);
+						result = OnError((string)eventDetail);
 						break;
 					case EventType.LogicalFill:
-						OnPositionChange((LogicalFillBinary)eventDetail);
+						result = OnPositionChange((LogicalFillBinary)eventDetail);
 						break;
 					case EventType.Terminate:
-						OnStop();
+						result = OnStop();
 			    		break;
 					case EventType.Initialize:
 					case EventType.Open:
@@ -237,6 +248,7 @@ namespace TickZoom.Test
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
+			return result;
 		}
 		
  		private volatile bool isDisposed = false;
