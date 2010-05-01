@@ -87,8 +87,6 @@
     <Compile Include="Startup\TestSimpleLoader.cs" />
     <Compile Include="Startup\TestSimpleStrategy.cs" />
     <Compile Include="Startup\InstrumentImpl.cs" />
-    <Compile Include="Startup\ProjectLoadTest.cs" />
-    <Compile Include="Startup\ProjectStarterTest.cs" />
     <Compile Include="Startup\StarterTest.cs" />
     <Compile Include="TickData\ConvertDataTest.cs" />
     <Compile Include="TickData\CreateSignatureTest.cs" />

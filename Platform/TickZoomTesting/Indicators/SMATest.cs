@@ -32,7 +32,7 @@ using TickZoom.TickUtil;
 
 #if REFACTORED
 
-namespace TickZoom.Unit.Indicators
+namespace TickZoom.Indicators
 {
 	[TestFixture]
 	public class SMATest

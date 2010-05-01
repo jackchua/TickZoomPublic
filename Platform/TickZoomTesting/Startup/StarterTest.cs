@@ -123,7 +123,31 @@ namespace TickZoom.StarterTest
 			starter.ProjectProperties.Starter.IntervalDefault = Intervals.Hour1;
     		starter.DataFolder = "TestData";
     		starter.ProjectProperties.Starter.Symbols = "USD_JPY";
-    		starter.Run(new OptimizeLoaderBad());
+    		try { 
+	    		starter.Run(new OptimizeLoaderBad());
+	    		Assert.Fail("Supposed to throw an exception about a bad optimize variable.");
+    		} catch( ApplicationException ex) {
+    			Assert.AreEqual("Error, setting optimize variables.",ex.Message);
+    		}
+    		Assert.IsFalse(File.Exists(storageFolder+@"\Statistics\optimizeResults.csv"));
+		}
+		
+		[Test]
+		public void TestGeneticBadVariable()
+		{
+			Thread.Sleep(2000); // Delay for file lock to get released.
+			Starter starter = new GeneticStarter();
+    		starter.ProjectProperties.Starter.StartTime = (TimeStamp) new DateTime(2005,1,1);
+    		starter.ProjectProperties.Starter.EndTime = (TimeStamp) new DateTime(2006,2,1);
+			starter.ProjectProperties.Starter.IntervalDefault = Intervals.Hour1;
+    		starter.DataFolder = "TestData";
+    		starter.ProjectProperties.Starter.Symbols = "USD_JPY";
+    		try { 
+	    		starter.Run(new OptimizeLoaderBad());
+	    		Assert.Fail("Supposed to throw an exception about a bad optimize variable.");
+    		} catch( ApplicationException ex) {
+    			Assert.AreEqual("Error, setting optimize variables.",ex.Message);
+    		}
     		Assert.IsFalse(File.Exists(storageFolder+@"\Statistics\optimizeResults.csv"));
 		}
 		

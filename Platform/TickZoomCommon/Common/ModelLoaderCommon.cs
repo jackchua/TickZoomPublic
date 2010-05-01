@@ -87,7 +87,11 @@ namespace TickZoom.Common
 				models.Add( model as Strategy);
 				return model as Strategy;
 			} else {
-				throw new ApplicationException("Name passed to CreateStrategy() was of type " + model.GetType().Name + " instead of a strategy. Perhaps, try CreatePortfolio() instead.");
+				if( model == null) {
+					throw new ApplicationException("Name passed to CreateStrategy() was not found: " + type);
+				} else {
+					throw new ApplicationException("Name passed to CreateStrategy() was of type " + model.GetType().Name + " instead of a strategy. Perhaps, try CreatePortfolio() instead.");
+				}
 			}
 		}
 

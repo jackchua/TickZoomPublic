@@ -253,10 +253,7 @@ namespace TickZoom.Common
 		public int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds)
 		{
 			int end = startTime + timeoutSeconds * 1000;
-			while( !isRealTime && Environment.TickCount < end) {
-				Thread.Sleep(100);
-			}
-			while( isRealTime && count < expectedTickCount && Environment.TickCount < end) {
+			while( count < expectedTickCount && Environment.TickCount < end) {
 				Thread.Sleep(100);
 			}
 			log.Notice("Last tick received: " + tickIO.ToPosition());
@@ -303,10 +300,6 @@ namespace TickZoom.Common
 		public void OnHistorical(SymbolInfo symbol)
 		{
 			receiverState = ReceiverState.Historical;
-		}
-
-		public bool CanReceive( SymbolInfo symbol) {
-			return tickQueue != null && tickQueue.CanEnqueue;
 		}
 
 		public void OnSend(ref TickBinary o)
@@ -401,7 +394,7 @@ namespace TickZoom.Common
 		}
 		
 		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
-			if( isDisposed || !CanReceive(symbol)) return false;
+			if( isDisposed) return false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:

@@ -80,6 +80,17 @@ namespace TickZoom.Common
 		public override void Run(ModelLoaderInterface loader)
 		{
 			this.loader = loader;
+
+    		try {
+    			if( loader.OptimizeOutput == null) {
+		    		Directory.CreateDirectory( Path.GetDirectoryName(FileName));
+		    		File.Delete(FileName);
+    			}
+    		} catch( Exception ex) {
+    			log.Error("Error while creating directory and deleting '" + FileName + "'.",ex);
+    			return;
+    		}
+			
 			log.Notice( "Beginning Genetic Optimize of: ");
 			log.Notice( loader.Name + " model loader. Type: " + loader.GetType().Name);
 			loader.QuietMode = true;

@@ -82,7 +82,7 @@ namespace TickZoom.Api
 	    
 	    public void ForceUnlock() {
 	    	Thread.EndCriticalRegion();
-   			isLocked = 0;
+	    	Interlocked.Exchange(ref isLocked, 0);
    			lockCount = 0;
 	    }
 		

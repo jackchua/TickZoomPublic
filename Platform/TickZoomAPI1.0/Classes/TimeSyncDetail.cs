@@ -25,50 +25,10 @@
 #endregion
 
 using System;
-using System.Threading;
 
 namespace TickZoom.Api
 {
-	public class SimpleLock : IDisposable {
-		private static Log log = Factory.Log.GetLogger(typeof(SimpleLock));
-		private string lastLock = "";
-		private static bool debug = log.IsDebugEnabled;
-	    private int isLocked = 0;
-	    
-		public bool IsLocked {
-			get { return isLocked == 1; }
-		}
-	    
-		public bool TryLock() {
-	    	bool retVal = isLocked == 0 && Interlocked.CompareExchange(ref isLocked,1,0) == 0;
-	    	if( debug && retVal) {
-	    		lastLock = Environment.StackTrace;
-	    	}
-	    	return retVal;
-	    }
-	    
-		public void Lock() {
-			while( !TryLock()) {
-				Factory.Parallel.Yield();
-	    	}
-	    }
-	    
-	    public SimpleLock Using() {
-	    	Lock();
-	    	return this;
-	    }
-	    
-	    public void Unlock() {
-	    	Interlocked.Exchange(ref isLocked, 0);
-	    }
-		
-		public void Dispose()
-		{
-			Unlock();
-		}
-		
-		public string LastLock {
-			get { return lastLock; }
-		}
+	public class TimeSyncDetail {
+		public TickBinary Tick;
 	}
 }

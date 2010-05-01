@@ -76,12 +76,7 @@ namespace TickZoom.Common
 			
 			totalTasks = 0;
 
-			try {
-				RecursiveOptimize(0);
-			} catch( ApplicationException ex) {
-				log.Error(ex.Message);
-				return;
-			}
+			RecursiveOptimize(0);
 			
 			tasksRemaining = totalTasks;
 
