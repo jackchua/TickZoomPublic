@@ -88,7 +88,7 @@ namespace MiscTest
 				for( int i=0; i<10; i++) {
 					log.Notice("Processing #" + (i+1));
 					form.HistoricalButtonClick(null,null);
-					WaitComplete(30, () => { return !form.ProcessWorker.IsBusy && form.PortfolioDocs[i].Visible; } );
+					WaitComplete(120, () => { return !form.ProcessWorker.IsBusy && form.PortfolioDocs[i].Visible; } );
 					Assert.AreEqual(form.PortfolioDocs.Count,i+1,"Charts");
 					Assert.IsTrue(form.PortfolioDocs[i].Visible,"Chart visible failed at " + i);
 					Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
