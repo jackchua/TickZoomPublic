@@ -272,6 +272,13 @@ namespace TickZoom.Common
 					if (!tickQueue.CanDequeue)
 						return null;
 					tickQueue.Dequeue(ref tickBinary);
+#if DEBUG					
+					if( count % 10 == 0) {
+#else
+					if( count % 10 == 0) {
+#endif
+						Thread.Sleep(1);
+					}
 					tickIO.Inject(tickBinary);
 					if (debug && count < 5) {
 						log.Debug("Received a tick " + tickIO);

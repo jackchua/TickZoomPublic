@@ -30,10 +30,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading;
-
 using TickZoom.Api;
-
-//using TickZoom.Api;
 
 namespace TickZoom.TickUtil
 {
@@ -168,6 +165,7 @@ namespace TickZoom.TickUtil
 	    long position = 0;
 	    BinaryReader dataIn = null; 
 		Y tickIO = new Y();
+		
         TickBinary tick = new TickBinary();
 		bool isDataRead = false;
 		bool isFirstTick = true;
@@ -462,5 +460,8 @@ namespace TickZoom.TickUtil
 			set { bulkFileLoad = value; }
 		}
 	
+		public Y LastTick {
+			get { return tickIO; }
+		}
 	}
 }
