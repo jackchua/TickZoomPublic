@@ -260,7 +260,7 @@ namespace TickZoom.TickUtil
 		
 		private Yield FileReader() {
 			lock( taskLocker) {
-				if( isDisposed ) return null;
+				if( isDisposed ) return Yield.Terminate;
 				try {
 		    		if( position < length && !CancelPending) {
 						ReadTick();
@@ -281,11 +281,11 @@ namespace TickZoom.TickUtil
 						
 		    			if( maxCount > 0 && count > maxCount) {
 							if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
-							return SendFinish;
+							return Yield.DidWork.Invoke(SendFinish);
 		    			}
 		    			
 						if( IsAtEnd(tick)) {
-							return SendFinish;
+							return Yield.DidWork.Invoke(SendFinish);
 		    			}
 		    
 		    			if( IsAtStart(tick)) {
@@ -299,46 +299,46 @@ namespace TickZoom.TickUtil
 		    				
 			    			if( isFirstTick) {
 			    				isFirstTick = false;
-			    				return StartEvent;
+			    				return Yield.DidWork.Invoke(StartEvent);
 			    			}
 							
-		    				return TickEvent;
+		    				return Yield.DidWork.Invoke(TickEvent);
 						}
 						
 					} else {
-						return SendFinish;
+						return Yield.DidWork.Invoke(SendFinish);
 					}
 				} catch( ObjectDisposedException) {
-					return SendFinish;
+					return Yield.DidWork.Invoke(SendFinish);
 				}
-			    return FileReader;
+   				return Yield.DidWork.Repeat;
 			}
 		}
 		
 		private Yield StartEvent() {
 			if( !receiver.OnEvent(symbol,(int)EventType.StartHistorical,null)) {
-				return StartEvent;
+				return Yield.NoWork.Repeat;
 			} else {
 				if( !quietMode) {
 					LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
 				}
-				return TickEvent;
+				return Yield.DidWork.Invoke(TickEvent);
 			}
 		}
 		
 		private Yield TickEvent() {
 			if( !receiver.OnEvent(symbol,(int)EventType.Tick,tick)) {
-				return TickEvent;
+				return Yield.NoWork.Repeat;
 			} else {
-				return FileReader;
+				return Yield.DidWork.Return;
 			}
 		}
 		
 		private Yield SendFinish() {
 			if( count > 0 && !receiver.OnEvent(symbol,(int)EventType.EndHistorical,null)) {
-				return SendFinish;
+				return Yield.NoWork.Repeat;
 			} else {
-				return FinishTask;
+				return Yield.DidWork.Invoke(FinishTask);
 			}
 		}
 		
@@ -370,7 +370,7 @@ namespace TickZoom.TickUtil
 					dataIn.Close();
 				}
     		}
-			return null;
+			return Yield.Terminate;
 		}
 		
 	    public void Dispose() 

@@ -28,12 +28,68 @@ using System;
 
 namespace TickZoom.Api
 {
-	public delegate Yield Yield();
+		
+	public enum YieldStatus {
+		None,
+		Invoke,
+		Return,
+		Repeat,
+		Terminate,
+	}
+	
+	public delegate Yield YieldMethod();
+	public struct Yield {
+		public bool IsIdle;
+		public YieldMethod Method;
+		public YieldStatus Status;
+		
+		public Yield Invoke(YieldMethod method) {
+			Method = method;
+			Status = YieldStatus.Invoke;
+			return this;
+		}
+		
+		public Yield Return {
+			get {
+				Status = YieldStatus.Return;
+				return this;
+			}
+		}
+		
+		public Yield Repeat {
+			get {
+				Status = YieldStatus.Repeat;
+				return this;
+			}
+		}
+		
+		public static Yield Terminate {
+			get {
+				Yield yield = new Yield();
+				yield.Status = YieldStatus.Terminate;
+				return yield;
+			}
+		}
+		
+		public static Yield DidWork {
+			get {
+				return new Yield();
+			}
+		}
+		
+		public static Yield NoWork {
+			get {
+				Yield yield = new Yield();
+				yield.IsIdle = true;
+				return yield;
+			}
+		}
+	}
 	
 	public interface ParallelStarter
 	{
 		void Once(object creator, Action once);
-		Task Loop(object creator, Yield loop);
+		Task Loop(object creator, YieldMethod loop);
 		void For(object creator, int start, int stop, Action<int> loop);
 		void While(object creator, Func<bool> loop);
 	}

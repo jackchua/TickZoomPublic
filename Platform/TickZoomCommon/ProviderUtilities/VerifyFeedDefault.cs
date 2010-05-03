@@ -266,11 +266,11 @@ namespace TickZoom.Common
 		{
 			lock(taskLocker) {
 				if( isDisposed) {
-					return null;
+					return Yield.Terminate;
 				}
 				try {
 					if (!tickQueue.CanDequeue)
-						return null;
+						return Yield.NoWork.Repeat;
 					tickQueue.Dequeue(ref tickBinary);
 #if DEBUG					
 					if( count % 10 == 0) {
@@ -291,11 +291,11 @@ namespace TickZoom.Common
 					if (count % 1000000 == 0) {
 						log.Notice("Read " + count + " ticks");
 					}
-					return TimeTheFeedTask;
+					return Yield.DidWork.Repeat;
 				} catch (QueueException ex) {
 					HandleQueueException(ex);
 				}
-				return null;
+				return Yield.NoWork.Repeat;
 			}
 		}
 
