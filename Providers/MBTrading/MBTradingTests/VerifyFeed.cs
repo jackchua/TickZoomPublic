@@ -122,7 +122,7 @@ namespace TickZoom.Test
 	
 		public Yield TimeTheFeedTask() {
 			try {
-       			if( !tickQueue.CanDequeue) return null;
+       			if( !tickQueue.CanDequeue) return Yield.NoWork.Repeat;
             	tickQueue.Dequeue(ref tickBinary);
        			tick.Inject(tickBinary);
 				if( debug && count < 5)
@@ -134,16 +134,16 @@ namespace TickZoom.Test
 				if( count%1000000 == 0) {
 					log.Notice("Read " + count + " ticks");
 				}
-				return TimeTheFeedTask;
+				return Yield.DidWork.Repeat;
            	} catch( QueueException ex) {
        			if( EventType.EndHistorical != ex.EntryType) {
        				throw new ApplicationException( "Unexpected QueueException: " + ex.EntryType);
        			}
             	log.Debug("Queue Terminated");
             	Factory.Parallel.CurrentTask.Stop();
-            	return TimeTheFeedTask;
+            	return Yield.DidWork.Repeat;
         	}
-       		return null;
+       		return Yield.NoWork.Repeat;
 		}
        	
 		public bool OnRealTime(SymbolInfo symbol) {
