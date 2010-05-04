@@ -32,7 +32,7 @@ namespace TickZoom.Common
 {
 	public class FillSimulatorDefault : FillSimulator
 	{
-		private static readonly Log Log = Factory.Log.GetLogger(typeof(FillSimulator));
+		private static readonly Log Log = Factory.Log.GetLogger(typeof(FillSimulatorDefault));
 		private static readonly bool IsTrace = Log.IsTraceEnabled;
 		private static readonly bool IsDebug = Log.IsDebugEnabled;
 		private static readonly bool IsNotice = Log.IsNoticeEnabled;

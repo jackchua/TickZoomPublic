@@ -51,32 +51,28 @@ namespace TickZoom.TickUtil
 			sender.SendEvent(this,null,(int)EventType.Connect,null);
 		}
 		
-		public bool CanReceive( SymbolInfo symbol) {
-			return readQueue.CanEnqueue;
-		}
-		
 		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
-			if( !CanReceive(symbol)) return false;
+			bool result = false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
 						TickBinary binary = (TickBinary) eventDetail;
-						readQueue.EnQueue(ref binary);
+						result = readQueue.TryEnQueue(ref binary);
 						break;
 					case EventType.EndHistorical:
-						readQueue.EnQueue(EventType.EndHistorical, symbol);
+						result = readQueue.TryEnQueue(EventType.EndHistorical, symbol);
 						break;
 					case EventType.StartRealTime:
-						readQueue.EnQueue(EventType.StartRealTime, symbol);
+						result = readQueue.TryEnQueue(EventType.StartRealTime, symbol);
 						break;
 					case EventType.EndRealTime:
-						readQueue.EnQueue(EventType.EndRealTime, symbol);
+						result = readQueue.TryEnQueue(EventType.EndRealTime, symbol);
 						break;
 					case EventType.Error:
-			    		readQueue.EnQueue(EventType.Error, symbol);
+			    		result = readQueue.TryEnQueue(EventType.Error, symbol);
 			    		break;
 					case EventType.Terminate:
-			    		readQueue.EnQueue(EventType.Terminate, symbol);
+			    		result = readQueue.TryEnQueue(EventType.Terminate, symbol);
 			    		break;
 					case EventType.LogicalFill:
 					case EventType.StartHistorical:
@@ -85,13 +81,14 @@ namespace TickZoom.TickUtil
 					case EventType.Close:
 					case EventType.PositionChange:
 					default:
+			    		// Skip these event types.
+			    		result = true;
 						break;
 				}
-				return true;
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
-			return false;
+			return result;
 		}
 		
 		public TickQueue ReadQueue {

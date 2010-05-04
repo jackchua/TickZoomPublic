@@ -173,8 +173,8 @@ namespace MiscTest
 					TickBinary tick2 = new TickBinary();
 					try {
 						while(true) {
-							reader1.ReadQueue.Dequeue(ref tick1);
-							reader2.ReadQueue.Dequeue(ref tick2);
+							while(!reader1.ReadQueue.TryDequeue(ref tick1)) { Thread.Sleep(1); }
+							while(!reader2.ReadQueue.TryDequeue(ref tick2)) { Thread.Sleep(1); }
 							Assert.AreEqual(new TimeStamp(tick1.UtcTime),new TimeStamp(tick2.UtcTime));
 						}
 					} catch( QueueException ex) {

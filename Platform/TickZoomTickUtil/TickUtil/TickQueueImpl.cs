@@ -43,57 +43,78 @@ namespace TickZoom.TickUtil
 	    public TickQueueImpl(string name, int size) : base(name, size) {
 	    	
 	    }
-	    
+		
 	    public void EnQueue(ref TickBinary o)
+	    {
+	    	if( !TryEnQueue(ref o)) {
+	    		throw new ApplicationException("Enqueue failed.");
+	    	}
+	    }
+	    
+	    public bool TryEnQueue(ref TickBinary o)
 	    {
         	QueueItem item = new QueueItem();
     		item.EventType = 0;
     		item.Tick = o;
-    		while( !EnQueueStruct(ref item)) {
-    			Factory.Parallel.Yield();
-    		}
+    		return TryEnQueueStruct(ref item);
 	    }
 	    
 	    public void EnQueue(EventType entryType, SymbolInfo symbol)
+	    {
+	    	if( !TryEnQueue(entryType, symbol)) {
+	    		throw new ApplicationException("Enqueue failed.");
+	    	}
+	    }
+	    
+	    public bool TryEnQueue(EventType entryType, SymbolInfo symbol)
 	    {
         	QueueItem item = new QueueItem();
 	    	item.EventType = (int) entryType;
 	    	if( symbol != null) {
 	    		item.EventChange.Symbol = symbol.BinaryIdentifier;
 	    	}
-	    	while( !EnQueueStruct(ref item)) {
-	    		Factory.Parallel.Yield();
-	    	}
+	    	return TryEnQueueStruct(ref item);
 	    }
 	    
 	    public void EnQueue(EventType entryType, string error)
 	    {
+	    	if( !TryEnQueue(entryType, error)) {
+	    		throw new ApplicationException("Enqueue failed.");
+	    	}
+	    }
+	    
+	    public bool TryEnQueue(EventType entryType, string error)
+	    {
         	QueueItem item = new QueueItem();
 	    	item.EventType = (int) entryType;
-//	    	item.ErrorEvent.Message = error;
-	    	while( !EnQueueStruct(ref item)) {
-	    		Factory.Parallel.Yield();
-	    	}
+	    	return TryEnQueueStruct(ref item);
 	    }
 	    
 	    public void Dequeue(ref TickBinary tick)
 	    {
+	    	while( !TryDequeue(ref tick)) {
+	    		Thread.Sleep(1);
+	    	}
+	    }
+	    
+	    public bool TryDequeue(ref TickBinary tick)
+	    {
         	QueueItem item = new QueueItem();
-	    	while( !DequeueStruct(ref item)) {
-        		Factory.Parallel.Yield();
+	    	bool result = TryDequeueStruct(ref item);
+	    	if( result) {
+		    	if( item.EventType != 0) {
+		    		string symbol;
+		    		if( item.Tick.Symbol != 0) {
+		    			symbol = item.Tick.Symbol.ToSymbol();
+		    		} else {
+		    			symbol = "";
+		    		}
+		    		throw new QueueException( (EventType) item.EventType, symbol);
+		    	} else {
+		    		tick = item.Tick;
+		    	}
 	    	}
-	    	// If not a tick
-	    	if( item.EventType != 0) {
-	    		string symbol;
-	    		if( item.Tick.Symbol != 0) {
-	    			symbol = item.Tick.Symbol.ToSymbol();
-	    		} else {
-	    			symbol = "";
-	    		}
-	    		throw new QueueException( (EventType) item.EventType, symbol);
-	    	} else {
-	    		tick = item.Tick;
-	    	}
+	    	return result;
 	    }
 	    
 	    public void LogStats() {

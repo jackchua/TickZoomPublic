@@ -31,10 +31,12 @@ namespace TickZoom.Api
 {
 	public interface TickWriter {
 		void Initialize(string folder, string symbol);
+		bool TryAdd(TickIO tick);
 		void Add(TickIO tick);
 		void Pause();
 		void Resume();
 		void Close();
+		[Obsolete("Please discontinue use of CanReceive() and simply check the return value of TryAdd() instaed to find out if the add was succesful.",true)]
 		bool CanReceive {
 			get;
 		}

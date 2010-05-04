@@ -50,14 +50,14 @@ namespace TickZoom.TickData
 			TickIO tickIO = new TickImpl();
 			int start = Environment.TickCount;
 			for(int i=0; i<10; i++) {
-				queue.EnQueue(ref tick);
+				Assert.IsTrue(queue.TryEnQueue(ref tick));
 			}
 			int stop = Environment.TickCount;
 			log.Notice("Enqueue elapsed time is "+(stop-start)+"ms");
 			
 			start = Environment.TickCount;
 			for(int i=0; i<10; i++) {
-				queue.Dequeue(ref tick);
+				Assert.IsTrue(queue.TryDequeue(ref tick));
 			}
 			stop = Environment.TickCount;
 			log.Notice("Dequeue elapsed time is "+(stop-start)+"ms");

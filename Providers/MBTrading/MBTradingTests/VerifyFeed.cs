@@ -60,19 +60,18 @@ namespace TickZoom.Test
             int startTime = Environment.TickCount;
             count = 0;
 			while( Environment.TickCount - startTime < timeout * 1000 ) {
-        		if( !tickQueue.CanDequeue) Thread.Sleep(100);
-        		if( tickQueue.CanDequeue) {
-        			if( HandleTick(expectedCount, assertTick,symbol)) {
-        				break;
-        			}
-        		}
+    			if( HandleTick(expectedCount, assertTick,symbol)) {
+    				break;
+    			}
         	}
             return count;
 		}
 
 		private bool HandleTick(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol) {
 			try { 
-            	tickQueue.Dequeue(ref tickBinary);
+    			while( !tickQueue.TryDequeue(ref tickBinary)) {
+    				Thread.Sleep(1);
+    			}
             	tick.Inject(tickBinary);
 				if( debug && countLog < 5)
 				{
@@ -122,8 +121,9 @@ namespace TickZoom.Test
 	
 		public Yield TimeTheFeedTask() {
 			try {
-       			if( !tickQueue.CanDequeue) return Yield.NoWork.Repeat;
-            	tickQueue.Dequeue(ref tickBinary);
+       			if( !tickQueue.TryDequeue(ref tickBinary)) {
+	       			return Yield.NoWork.Repeat;
+       			}
        			tick.Inject(tickBinary);
 				if( debug && count < 5)
 				{
@@ -141,9 +141,8 @@ namespace TickZoom.Test
        			}
             	log.Debug("Queue Terminated");
             	Factory.Parallel.CurrentTask.Stop();
-            	return Yield.DidWork.Repeat;
+            	return Yield.NoWork.Repeat;
         	}
-       		return Yield.NoWork.Repeat;
 		}
        	
 		public bool OnRealTime(SymbolInfo symbol) {
@@ -154,14 +153,10 @@ namespace TickZoom.Test
        		return true;
 		}
 		
-       	public bool CanReceive( SymbolInfo symbol) {
-       		return tickQueue != null && tickQueue.CanEnqueue;
-		}
-	 		
 		public bool OnSend(ref TickBinary o)
 		{
 			try {
-				tickQueue.EnQueue(ref o);
+				return tickQueue.TryEnQueue(ref o);
 			} catch( QueueException) {
 				// Queue already terminated.
 			}
@@ -176,7 +171,7 @@ namespace TickZoom.Test
 	    public bool OnStop()
 		{
 			try {
-	    		tickQueue.EnQueue(EventType.Terminate, (SymbolInfo) null);
+	    		return tickQueue.TryEnQueue(EventType.Terminate, (SymbolInfo) null);
 			} catch( QueueException) {
 				// Queue already terminated.
 			}
@@ -195,14 +190,14 @@ namespace TickZoom.Test
 		
 		public bool OnEndHistorical(SymbolInfo symbol)
 		{
-			tickQueue.EnQueue(EventType.EndHistorical, symbol);
+			return tickQueue.TryEnQueue(EventType.EndHistorical, symbol);
 			return true;
 		}
 		
 		public bool OnEndRealTime(SymbolInfo symbol)
 		{
        		try {
-				tickQueue.EnQueue(EventType.EndRealTime, symbol);
+				return tickQueue.TryEnQueue(EventType.EndRealTime, symbol);
        		} catch ( QueueException) {
        			// Queue was already ended.
        		}

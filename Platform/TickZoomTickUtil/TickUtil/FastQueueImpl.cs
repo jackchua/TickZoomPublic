@@ -99,28 +99,18 @@ namespace TickZoom.TickUtil
 	    }
 	    
 		private bool SpinLockNB() {
-        	spinLock.Lock();
-        	return true;
+        	return spinLock.TryLock();
 	    }
 	    
 	    private void SpinUnLock() {
         	spinLock.Unlock();
 	    }
 	    
-	    public bool CanEnqueue {
-	    	get { return queue != null && queue.Count<maxSize && !spinLock.WillBlock; }
-	    }
-	    
-	    public bool CanDequeue {
-	    	get { 
-		    	if( !isStarted) { 
-		    		if( !StartDequeue()) return false;
-		    	}
-	    		return queue!=null && queue.Count>0 && !spinLock.WillBlock;
-	    	}
-	    }
-	    
-	    public bool EnQueueStruct(ref T tick)
+        public bool EnQueueStruct(ref T tick) {
+        	return TryEnQueueStruct(ref tick);
+        }
+        
+	    public bool TryEnQueueStruct(ref T tick)
 	    {
             if( terminate) {
 	    		if( exception != null) {
@@ -130,13 +120,22 @@ namespace TickZoom.TickUtil
 	    		}
             }
             // If the queue is full, wait for an item to be removed
-            if( queue.Count>=maxSize) return false;
+            if( queue == null || queue.Count>=maxSize) return false;
             if( !SpinLockNB()) return false;
-           	queue.Enqueue(tick);
-            SpinUnLock();
-            return true;
+            try { 
+	            if( queue == null || queue.Count>=maxSize) return false;
+	           	queue.Enqueue(tick);
+            } finally {
+	            SpinUnLock();
+            }
+	        return true;
 	    }
-	    public bool DequeueStruct(ref T tick)
+	    
+	    public bool DequeueStruct(ref T tick) {
+	    	return TryDequeueStruct(ref tick);
+	    }
+	    
+	    public bool TryDequeueStruct(ref T tick)
 	    {
             if( terminate) {
 	    		if( exception != null) {
@@ -151,8 +150,12 @@ namespace TickZoom.TickUtil
 	    	}
 	        if( queue == null || queue.Count==0) return false;
 	    	if( !SpinLockNB()) return false;
-            tick = queue.Dequeue();
-            SpinUnLock();
+	    	try {
+		        if( queue == null || queue.Count==0) return false;
+	            tick = queue.Dequeue();
+	    	} finally {
+	            SpinUnLock();
+	    	}
             return true;
 	    }
 	    
@@ -179,10 +182,10 @@ namespace TickZoom.TickUtil
 	    
 	    public void Terminate() {
 	    	terminate = true;
-	    	spinLock.ForceUnlock();
 	        if( queue!=null) {
+	    		while( !SpinLockNB()) ;
 		        QueuePool.Free(queue);
-		        queue=null;
+		        SpinUnLock();
 	        }
 	    }
 	

@@ -26,6 +26,8 @@
 
 using System;
 using System.IO;
+using System.Threading;
+
 using TickZoom.Api;
 using TickZoom.TickUtil;
 
@@ -63,9 +65,13 @@ namespace tzdata
 			bool first = false;
 			try {
 				while(true) {
-					reader.ReadQueue.Dequeue(ref tickBinary);
+					while( !reader.ReadQueue.TryDequeue(ref tickBinary)) {
+						Thread.Sleep(1);
+					}
 					tickIO.Inject(tickBinary);
-					writer.Add(tickIO);
+					while( !writer.TryAdd(tickIO)) {
+						Thread.Sleep(1);
+					}
 					if( first) {
 						firstTick.Copy(tickIO);
 						first = false;

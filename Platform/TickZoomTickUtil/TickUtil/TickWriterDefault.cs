@@ -141,9 +141,11 @@ namespace TickZoom.TickUtil
 		protected virtual bool AppendData() {
 			try {
 				while( isPaused) {
-					Factory.Parallel.Yield();
+					Thread.Sleep(1);
 				}
-				writeQueue.Dequeue(ref tick);
+				while( !writeQueue.TryDequeue(ref tick)) {
+					Thread.Sleep(1);
+				}
 				tickIO.Inject(tick);
 				if( trace) {
 					log.TimeStamp = tickIO.Time;
@@ -222,17 +224,24 @@ namespace TickZoom.TickUtil
 		protected virtual void CompressTick(TickBinary tick, MemoryStream memory) {
 		}
 		
-		public void Add(TickIO tickIO) {
+		public void Add(TickIO tick) {
+			while( !TryAdd(tick)) {
+				Thread.Sleep(1);
+			}
+		}
+		
+		public bool TryAdd(TickIO tickIO) {
 			if( !isInitialized) {
 				throw new ApplicationException("Please initialized TickWriter first.");
 			}
 			TickBinary tick = tickIO.Extract();
-			writeQueue.EnQueue(ref tick);
+			return writeQueue.TryEnQueue(ref tick);
 		}
 		
+		[Obsolete("Please discontinue use of CanReceive() and simple check the return value of TryAdd() instaed to find out if the add was succesful.",true)]
 		public bool CanReceive {
 			get {
-				return writeQueue != null && writeQueue.CanEnqueue;
+				return true;
 			}
 		}
 		
@@ -242,9 +251,10 @@ namespace TickZoom.TickUtil
 			}
 			if( debug) log.Debug("Entering Close()");
     		if( appendThread != null && writeQueue != null) {
-				writeQueue.EnQueue(EventType.Terminate, symbol);
+				while( !writeQueue.TryEnQueue(EventType.Terminate, symbol)) {
+					Thread.Sleep(1);
+				}
 				appendThread.Join();
-				writeQueue = null;
 			}
 			if( keepFileOpen && fs!=null ) {
 	    		fs.Close();

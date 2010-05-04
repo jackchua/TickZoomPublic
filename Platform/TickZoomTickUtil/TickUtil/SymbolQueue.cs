@@ -76,32 +76,29 @@ namespace TickZoom.TickUtil
 		{
 		}
 		
-		public bool CanReceive(SymbolInfo symbol) {
-			return tickQueue.CanEnqueue;
-		}
-		
 		public bool OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
-	    	if( isDisposed || !CanReceive(symbol)) return false;
+			bool result = false;
+	    	if( isDisposed) return false;
 			try {
 				switch( (EventType) eventType) {
 					case EventType.Tick:
 						TickBinary binary = (TickBinary) eventDetail;
-						tickQueue.EnQueue(ref binary);
+						result = tickQueue.TryEnQueue(ref binary);
 						break;
 					case EventType.EndHistorical:
-						tickQueue.EnQueue(EventType.EndHistorical, symbol);
+						result = tickQueue.TryEnQueue(EventType.EndHistorical, symbol);
 						break;
 					case EventType.StartRealTime:
-						tickQueue.EnQueue(EventType.StartRealTime, symbol);
+						result = tickQueue.TryEnQueue(EventType.StartRealTime, symbol);
 						break;
 					case EventType.EndRealTime:
-						tickQueue.EnQueue(EventType.EndRealTime, symbol);
+						result = tickQueue.TryEnQueue(EventType.EndRealTime, symbol);
 						break;
 					case EventType.Error:
-			    		tickQueue.EnQueue(EventType.Error, symbol);
+			    		result = tickQueue.TryEnQueue(EventType.Error, symbol);
 			    		break;
 					case EventType.Terminate:
-			    		tickQueue.EnQueue(EventType.Terminate, symbol);
+			    		result = tickQueue.TryEnQueue(EventType.Terminate, symbol);
 			    		break;
 					case EventType.LogicalFill:
 					case EventType.StartHistorical:
@@ -112,37 +109,14 @@ namespace TickZoom.TickUtil
 					default:
 						break;
 				}
-	    		return true;
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
-	    	return false;
+	    	return result;
 		}
 		
-	    public void Receive(ref TickBinary tick) {
-			tickQueue.Dequeue(ref tick);
-		}
-		
-		public void OnRealTime(SymbolInfo symbol1) {
-		}
-		
-		public void OnHistorical(SymbolInfo symbol1) {
-			tickQueue.EnQueue(EventType.StartHistorical, symbol1);
-		}
-		
-		public void OnEndHistorical(SymbolInfo symbol1)
-		{
-			tickQueue.EnQueue(EventType.EndHistorical, symbol);
-		}
-		
-		public void OnEndRealTime(SymbolInfo symbol1)
-		{
-			tickQueue.EnQueue(EventType.EndRealTime, symbol);
-		}
-		
-		public void OnError(string error)
-		{
-			tickQueue.EnQueue(EventType.Error, error);
+	    public bool Receive(ref TickBinary tick) {
+			return tickQueue.TryDequeue(ref tick);
 		}
 		
  		private volatile bool isDisposed = false;

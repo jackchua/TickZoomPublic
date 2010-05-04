@@ -126,28 +126,34 @@ namespace TickZoom.TickUtil
 			if( !receiver.OnEvent(symbol,(int)EventType.Tick,tick)) {
 				return Yield.NoWork.Repeat;
 			} else {
-				try {
-					SymbolQueue inputQueue = symbolQueues[nextQueue];
-					inputQueue.Receive(ref tick);
-					inputQueue.NextTick = tick;
-					inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
-					return Yield.DidWork.Invoke(Process);
-				} catch( QueueException ex) {
-					if( ex.EntryType == EventType.EndHistorical) {
-						if( symbolQueues.Count <= 1) {
-							if( !receiver.OnEvent(null,(int)EventType.Terminate,null)) {
-								throw new ApplicationException("Can't send Terminate.");
-							}
-							Factory.Parallel.CurrentTask.Stop();
-						} else {
-							symbolQueues.RemoveAt(nextQueue);
-						}
-					} else {
-						throw new ApplicationException("Queue returned invalid entry type: " + ex.EntryType, ex);
-					}
-				}
-				return Yield.DidWork.Return;
+				return Yield.DidWork.Invoke(SendTickToQueue);
 			}
+		}
+		
+		private Yield SendTickToQueue() {
+			try {
+				SymbolQueue inputQueue = symbolQueues[nextQueue];
+				if( !inputQueue.Receive(ref tick)) {
+					return Yield.NoWork.Repeat;
+				}
+				
+				inputQueue.NextTick = tick;
+				inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
+				return Yield.DidWork.Invoke(Process);
+			} catch( QueueException ex) {
+				if( ex.EntryType == EventType.EndHistorical) {
+					symbolQueues.RemoveAt(nextQueue);
+					if( symbolQueues.Count <= 0) {
+						if( !receiver.OnEvent(null,(int)EventType.Terminate,null)) {
+							throw new ApplicationException("Can't send Terminate.");
+						}
+						Factory.Parallel.CurrentTask.Stop();
+					}
+				} else {
+					throw new ApplicationException("Queue returned invalid entry type: " + ex.EntryType, ex);
+				}
+			}
+			return Yield.NoWork.Repeat;
 		}
 		
 		public void Stop(Receiver receiver)
@@ -230,8 +236,6 @@ namespace TickZoom.TickUtil
 		            		symbolQueues.Clear();
 		            	}
 		            }
-		            runTask = null;
-		            symbolQueues = null;
 	    		}
     		}
 	    }

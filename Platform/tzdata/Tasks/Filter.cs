@@ -26,6 +26,8 @@
 
 using System;
 using System.IO;
+using System.Threading;
+
 using TickZoom.Api;
 using TickZoom.TickUtil;
 
@@ -84,7 +86,9 @@ namespace tzdata
 			}
 			try {
 				while(true) {
-					inputQueue.Dequeue(ref tickBinary);
+					while( !inputQueue.TryDequeue(ref tickBinary)) {
+						Thread.Sleep(1);
+					}
 					tickIO.Inject(tickBinary);
 					
 					count++;
@@ -99,7 +103,9 @@ namespace tzdata
 //							if( elapsed.TotalMilliseconds < 5000) {
 //								fast++;
 //							} else {
-								writer.Add(prevTick);
+							while( !writer.TryAdd(prevTick)) {
+								Thread.Sleep(1);
+							}
 //							}	
 //						}
 					}

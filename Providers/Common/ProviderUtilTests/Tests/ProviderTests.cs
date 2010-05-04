@@ -126,18 +126,18 @@ namespace TickZoom.Test
 			using( VerifyFeed verify = Factory.Utility.VerifyFeed())
 			using( Provider provider = CreateProvider(true)) {
 				provider.SendEvent(verify,null,(int)EventType.Connect,null);
-				if(debug) log.Debug("===DemoConnectionTest===");
+				log.Info("===DemoStopSymbolTest===");
 				if(debug) log.Debug("===StartSymbol===");
 				provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
 				if(debug) log.Debug("===VerifyFeed===");
-		  		long count = verify.Verify(2,assertTick,symbol,25);
+		  		long count = verify.Verify(2,assertTick,symbol,25000);
 		  		Assert.GreaterOrEqual(count,2,"tick count");
 				if(debug) log.Debug("===StopSymbol===");
 		  		provider.SendEvent(verify,symbol,(int)EventType.StopSymbol,null);
 		  		
 		  		// Wait for it to switch out of real time or historical mode.
 		  		var expectedState = ReceiverState.Ready;
-		  		var actualState = verify.VerifyState(expectedState,symbol,5);
+		  		var actualState = verify.VerifyState(expectedState,symbol,25000);
 		  		Assert.AreEqual(expectedState,actualState,"after receiving a StopSymbol event, if your provider plugin was sending ticks then it must return either respond with an EndHistorical or EndRealTime event. If it has already sent one of those prior to the StopSymbol, then no reponse is required.");
 		  		
 		  		count = verify.Verify(0,assertTick,symbol,5);

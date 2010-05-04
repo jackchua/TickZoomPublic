@@ -53,10 +53,15 @@ namespace TickZoom.Api
 		}
 		
 	    void EnQueue(ref T o);
+	    bool TryEnQueue(ref T o);
 	    
 	    void EnQueue(EventType queueItemType, SymbolInfo symbol);
+	    bool TryEnQueue(EventType queueItemType, SymbolInfo symbol);
 	    
 	    void EnQueue(EventType queueItemType, string error);
+	    bool TryEnQueue(EventType queueItemType, string error);
+	    
+	    bool TryDequeue(ref T tick);
 	    
 	    void Dequeue(ref T tick);
 	    
@@ -85,12 +90,5 @@ namespace TickZoom.Api
 	    
 	    void LogStats();
 	    
-	    bool CanEnqueue { 
-	    	get;
-	    }
-	    
-	    bool CanDequeue { 
-	    	get;
-	    }
 	}
 }

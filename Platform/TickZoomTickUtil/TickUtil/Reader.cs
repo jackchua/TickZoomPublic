@@ -118,7 +118,9 @@ namespace TickZoom.TickUtil
 			position = 0;
 			try { 
 		    	while( position < length && !CancelPending) {
-					ReadTick();
+					if( !TryReadTick(length)) {
+						break;
+					}
 				}
 			} catch( ObjectDisposedException) {
 				// Only partial tick was read at the end of the file.
@@ -238,8 +240,11 @@ namespace TickZoom.TickUtil
 			get { return dataVersion; }
 		}
 		
-		private void ReadTick() {
+		private bool TryReadTick(long length) {
 			int size = dataIn.ReadByte();
+			if( position + size > length) {
+				return false;
+			}
 			position++;
 			// Check for old style prior to version 8 where
 			// single byte version # was first.
@@ -256,14 +261,16 @@ namespace TickZoom.TickUtil
 				tickIO.FromReader(memory);
 			}
    			tickIO.SetSymbol(lSymbol);
+   			return true;
 		}
 		
 		private Yield FileReader() {
 			lock( taskLocker) {
 				if( isDisposed ) return Yield.Terminate;
 				try {
-		    		if( position < length && !CancelPending) {
-						ReadTick();
+		    		if( position < length && !CancelPending
+					   && TryReadTick(length)) {
+						
 		    			if( dataVersion == 0) {
 		    				dataVersion = tickIO.DataVersion;			
 		    			}
@@ -283,7 +290,7 @@ namespace TickZoom.TickUtil
 							if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
 							return Yield.DidWork.Invoke(SendFinish);
 		    			}
-		    			
+						
 						if( IsAtEnd(tick)) {
 							return Yield.DidWork.Invoke(SendFinish);
 		    			}
@@ -335,7 +342,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		private Yield SendFinish() {
-			if( count > 0 && !receiver.OnEvent(symbol,(int)EventType.EndHistorical,null)) {
+			if( !receiver.OnEvent(symbol,(int)EventType.EndHistorical,null)) {
 				return Yield.NoWork.Repeat;
 			} else {
 				return Yield.DidWork.Invoke(FinishTask);
