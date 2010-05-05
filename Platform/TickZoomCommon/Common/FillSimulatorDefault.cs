@@ -213,9 +213,7 @@ namespace TickZoom.Common
 
 		private void ModifyPosition( double position, double price, TimeStamp time, LogicalOrder order) {
 			CreateLogicalFillHelper(position, price, time, order);
-			if (drawTrade != null) {
-				drawTrade(order, price, position);
-			}
+			TryDrawTrade(order, price, position);
 			CancelEnterOrders();
 		}
 		
@@ -451,9 +449,7 @@ namespace TickZoom.Common
 			LogMsg("Long Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
 			CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-			if (drawTrade != null) {
-				drawTrade(order, price, order.Positions);
-			}
+			TryDrawTrade(order, price, order.Positions);
 			CancelEnterOrders();
 		}
 
@@ -485,9 +481,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Long Limit Entry at " + tick);
 				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-				if (drawTrade != null) {
-					drawTrade(order, price, order.Positions);
-				}
+				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -497,9 +491,7 @@ namespace TickZoom.Common
 			LogMsg("Short Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Bid : tick.Price;
 			CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
-			if (drawTrade != null) {
-				drawTrade(order, price, -order.Positions);
-			}
+			TryDrawTrade(order, price, -order.Positions);
 			CancelEnterOrders();
 		}
 
@@ -516,9 +508,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Short Limit Entry at " + tick);
 				CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
-				if (drawTrade != null) {
-					drawTrade(order, price, -order.Positions);
-				}
+				TryDrawTrade(order, price, -order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -547,9 +537,7 @@ namespace TickZoom.Common
 						return;
 					}
 					filledOrder = order;
-					if (drawTrade != null) {
-						drawTrade(filledOrder,fill.Price,fill.Position);
-					}
+					TryDrawTrade(order, fill.Price, fill.Position);
 					if( IsDebug) Log.Debug( "Changing position because of fill");
 					changePosition(strategy.Data.SymbolInfo,fill);
 				}
