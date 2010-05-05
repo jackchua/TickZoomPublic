@@ -377,7 +377,7 @@ namespace TickZoom.MBTrading
             int lBuySell = size > 0 ? MBConst.VALUE_BUY : MBConst.VALUE_SELL;
 			string sSym = symbol.Symbol;
 			double dPrice = size > 0 ? lastAsk : lastBid;
-			int	lTIF = MBConst.VALUE_GTC;
+			int	lTIF = MBConst.VALUE_DAY;
             int lOrdType = MBConst.VALUE_MARKET;
 			int lVolType = MBConst.VALUE_NORMAL;
 			string sRoute = "MBTX";
