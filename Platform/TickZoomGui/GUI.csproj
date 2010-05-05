@@ -115,7 +115,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="ProfilingSessions\Session20100116_165506.sdps" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">
