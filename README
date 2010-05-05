@@ -1,19 +1,18 @@
 Documentation for TickZoom
 
-User Manual: Include install, update, and migrate instructions.
+User Manual: It includes install, update, and migrate instructions.
 
 http://tickzoom.wnmh.net/docs/0.8.4.959/index.html
 
-OBSOLETE ERRORS:
-          This version 0.6.x has rendered several entities obsolete in favor of new names that either better
-          fit the naming conventions or were suggested by users as more intuitive.
-          
-          To resolve these errors and warning quickly and easily, see "Resolving Obsolete Errors and Warnings"
-          in the User Manual above.
+
+GREATER STABILITY 
+	  This release 0.9.x offers far greater stability and reliability of the engine and provider services
+	  plus better performance in the handling of real time data. There have been almost zero changes
+	  to the open source platform as all this work was done in the engine and provider service.
           
 RELEASE NOTES:
-          See the manual above for current release notes. Also, you can view the exact same notes by clicking
-          the "Commit" tab on GitHub or looking at the git log after you do an update. Isn't that convenient?
+          See the commit history for this project on GitHub for the latest release notes. Simple click
+          the "Commit" tab on GitHub or look at the git log after you do an update. Isn't that convenient?
           Please give feedback on the improved release notes!
 
 NOTE: The TickZoom open source application auto downloads the TickZoom data engine for which

@@ -299,11 +299,11 @@ namespace Loaders
 			for( int i=0; i<testBarData.Count && i<goodBarData.Count; i++) {
 				BarInfo testInfo = testBarData[i];
 				BarInfo goodInfo = goodBarData[i];
-				Assert.AreEqual(goodInfo.Time,testInfo.Time,"Time at " + i);
-				Assert.AreEqual(goodInfo.Open,testInfo.Open,"Open at " + i);
-				Assert.AreEqual(goodInfo.High,testInfo.High,"High at " + i);
-				Assert.AreEqual(goodInfo.Low,testInfo.Low,"Low at " + i);
-				Assert.AreEqual(goodInfo.Close,testInfo.Close,"Close at " + i);
+				Assert.AreEqual(goodInfo.Time,testInfo.Time,"Time at bar " + i );
+				Assert.AreEqual(goodInfo.Open,testInfo.Open,"Open at bar " + i + " " + testInfo.Time);
+				Assert.AreEqual(goodInfo.High,testInfo.High,"High at bar " + i + " " + testInfo.Time);
+				Assert.AreEqual(goodInfo.Low,testInfo.Low,"Low at bar " + i + " " + testInfo.Time);
+				Assert.AreEqual(goodInfo.Close,testInfo.Close,"Close at bar " + i + " " + testInfo.Time);
 			}
 		}
 		
