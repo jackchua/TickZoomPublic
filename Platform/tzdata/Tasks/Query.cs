@@ -26,6 +26,7 @@
 
 using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 
 using TickZoom.Api;
@@ -33,57 +34,120 @@ using TickZoom.TickUtil;
 
 namespace tzdata
 {
-	/// <summary>
-	/// Description of Query.
-	/// </summary>
 	public class Query
 	{
+		StringBuilder stringBuilder = new StringBuilder();
+		TickReader reader = new TickReader();
+		
 		public Query(string[] args)
 		{
-			if( args.Length != 2) {
-				Console.Write("Query Usage:");
-				Console.Write("tzdata query <symbol> <file>");
+			if( args.Length != 2 && args.Length !=1 ) {
+				stringBuilder.AppendLine("Query Usage:");
+				stringBuilder.AppendLine("tzdata query <symbol> <file>");
+				stringBuilder.AppendLine("tzdata query <file>");
 				return;
 			}
-			string symbol = args[0];
-			string file = args[1];
-			ReadFile(file,symbol);
+			if( args.Length > 1) {
+				string symbol = args[0];
+				string filePath = args[1];
+				reader.Initialize(filePath,symbol);
+				ReadFile();
+			} else {
+				string filePath = args[0];
+				reader.Initialize(filePath);
+				ReadFile();
+			}
 		}
 		
-		public void ReadFile(string filePath, string symbol) {
-			TickReader reader = new TickReader();
-			reader.Initialize(filePath,symbol);
+		public void ReadFile() {
 			TickQueue queue = reader.ReadQueue;
 			TickImpl firstTick = new TickImpl();
 			TickImpl lastTick = new TickImpl();
 			TickImpl prevTick = new TickImpl();
 			long count = 0;
 			long dups = 0;
+			long quotes = 0;
+			long trades = 0;
+			long quotesAndTrades = 0;
 			TickIO tickIO = new TickImpl();
 			TickBinary tickBinary = new TickBinary();
-			queue.Dequeue(ref tickBinary);
-			tickIO.Inject(tickBinary);
-			count++;
-			firstTick.Copy( tickIO);
-			prevTick.Copy( tickIO);
-			try {
+			try { 
 				while(true) {
-					while( !queue.TryDequeue(ref tickBinary)) {
-						Thread.Sleep(1);
+					if( !TryGetNextTick(queue, ref tickBinary)) {
+						break;
 					}
 					tickIO.Inject(tickBinary);
-					count++;
-					if( tickIO.Bid == prevTick.Bid && tickIO.Ask == prevTick.Ask) {
-						dups++;
+					if( count == 0) {
+						firstTick.Copy(tickIO);
 					}
+					if( tickIO.IsQuote && tickIO.IsTrade) {
+						quotesAndTrades++;
+					} else if( tickIO.IsQuote) {
+						quotes++;
+					} else {
+						trades++;
+					}
+					if( count > 0) {
+						bool quoteDup = tickIO.IsQuote && prevTick.IsQuote && tickIO.Bid == prevTick.Bid && tickIO.Ask == prevTick.Ask;
+						bool tradeDup = tickIO.IsTrade && prevTick.IsTrade && tickIO.Price == prevTick.Price;
+						if( tickIO.IsQuote && tickIO.IsTrade) {
+							if( quoteDup && tradeDup) {
+								dups++;
+							}
+						} else if( tickIO.IsQuote) {
+							if( quoteDup) {
+								dups++;
+							}
+						} else {
+							if( tradeDup) {
+								dups++;
+							}
+						}
+					}
+					count++;
 					prevTick.Copy(tickIO);
 				}
-			} catch( CollectionTerminatedException) {
-				
+			} catch( QueueException) {
+				// Terminated.
 			}
 			lastTick.Copy( tickIO);
-			Console.WriteLine(reader.Symbol + ": " + count + " ticks from " + firstTick.Time + " to " + lastTick.Time + " " + dups + " duplicates");
+			stringBuilder.AppendLine("Symbol: " + reader.Symbol);
+			stringBuilder.AppendLine("Ticks: " + count);
+			if( quotes> 0) {
+				stringBuilder.AppendLine("Quote Only: " + quotes);
+			}
+			if( trades > 0) {
+				stringBuilder.AppendLine("Trade Only: " + trades);
+			}
+			if( quotesAndTrades > 0) {
+				stringBuilder.AppendLine("Quote and Trade: " + quotesAndTrades);
+			}
+			stringBuilder.AppendLine("From: " + firstTick.Time);
+			stringBuilder.AppendLine("To: " + lastTick.Time);
+			if( dups > 0) {
+				stringBuilder.AppendLine("Prices duplicates: " + dups);
+			}
 			TickReader.CloseAll();
+		}
+		
+		private bool TryGetNextTick(TickQueue queue, ref TickBinary binary) {
+			bool result = false;
+			do {
+				try {
+					result = queue.TryDequeue(ref binary);
+				} catch( QueueException ex) {
+					// Ignore any other events.
+					if( ex.EntryType == EventType.EndHistorical) {
+						throw;
+					}
+				}
+			} while( !result);
+			return result;
+		}
+		
+		public override string ToString()
+		{
+			return stringBuilder.ToString();
 		}
 	}
 }

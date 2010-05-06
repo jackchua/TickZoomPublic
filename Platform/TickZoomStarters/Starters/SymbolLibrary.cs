@@ -41,13 +41,19 @@ namespace TickZoom.Common
 	public class SymbolLibrary 
 	{
 		Dictionary<string,SymbolProperties> symbolMap;
+		Dictionary<string,SymbolProperties> abbrevMap;
 		Dictionary<ulong,SymbolProperties> universalMap;
 		public SymbolLibrary() {
 			symbolMap = new Dictionary<string, SymbolProperties>();
+			abbrevMap = new Dictionary<string, SymbolProperties>();
 			SymbolDictionary dictionary = SymbolDictionary.Create("universal",SymbolDictionary.UniversalDictionary);
 			IEnumerable<SymbolProperties> enumer = dictionary;
 			foreach( SymbolProperties symbolProperties in dictionary) {
 				symbolMap[symbolProperties.Symbol] = symbolProperties;
+				string abbreviation = symbolProperties.Symbol.StripInvalidPathChars();
+				if( !symbolMap.ContainsKey(abbreviation)) {
+					symbolMap[abbreviation] = symbolProperties;
+				}
 			}
 			dictionary = SymbolDictionary.Create("user",SymbolDictionary.UserDictionary);
 			foreach( SymbolProperties symbolProperties in dictionary) {

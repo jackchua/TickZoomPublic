@@ -26,6 +26,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+
 using TickZoom.Api;
 
 namespace tzdata
@@ -41,6 +43,14 @@ namespace tzdata
 			}
 			List<string> taskArgs = new List<string>(args);
 			taskArgs.RemoveAt(0); // Remove the command string.
+			
+			// Remove debug flag which is only used by the
+			// FactorySupport to determine console logging
+			// for bootstrap loading of assemblies. Other 
+			// debug logging gets controlled by app.config for
+			// log4net.
+			taskArgs.Remove("-d");
+			taskArgs.Remove("--debug");
 
 			if( args[0] == "migrate") {
 				new Migrate(taskArgs.ToArray());
@@ -49,9 +59,14 @@ namespace tzdata
 				new Filter(taskArgs.ToArray());
 			}
 			if( args[0] == "query") {
-				new Query(taskArgs.ToArray());
+				Console.Write(new Query(taskArgs.ToArray()));
 			}
-			
+			if( args[0] == "register") {
+				new Register(taskArgs.ToArray());
+			}
+			if( args[0] == "open") {
+				new Open(taskArgs.ToArray());
+			}
 		}
 	}
 }

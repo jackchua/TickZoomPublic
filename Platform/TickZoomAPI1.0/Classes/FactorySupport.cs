@@ -40,13 +40,18 @@ namespace TickZoom.Api
 		private static int errorCount = 0;
 		private static object locker = new object();
 		private static bool IsResolverSetup = false;
-		private static readonly Version 
-			
-		currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+		private static readonly Version currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+		private bool debugFlag = false;
 
 		public FactorySupport() {
 			Assembly.GetExecutingAssembly().GetName().Version = new Version();
 			string path = GetShadowCopyFolder();
+			foreach( var arg in Environment.GetCommandLineArgs()) {
+				if( arg == "-d" || arg == "--debug") {
+					debugFlag = true;
+					break;
+				}
+			}
 			if( Directory.Exists(path)) {
 				int startTime = Environment.TickCount;
 				bool isDeleted = false;
@@ -66,19 +71,19 @@ namespace TickZoom.Api
 		}
 		
 		internal void LogMsg(string message) {
-			System.Diagnostics.Debug.WriteLine(message);
-            Console.WriteLine(
-			AppDomain.CurrentDomain.FriendlyName+":"+
-				message);
+			if( debugFlag) {
+				System.Diagnostics.Debug.WriteLine(message);
+	            Console.WriteLine(message);
+			}
 		}
 		
 		public object Load( Type type, string assemblyName, params object[] args)
 		{
             LogMsg("Attempting Load of " + type + " from " + assemblyName);
 			errorCount = 0;
-			string currentDirectoryPath = System.Environment.CurrentDirectory;
+			string currentDirectoryPath = GetExecutablePath();
             
-            LogMsg("Environment.CurrentDirectory = " + currentDirectoryPath);
+            LogMsg("Executable Path = " + currentDirectoryPath);
 
             object obj = null;
             try { 
@@ -100,10 +105,12 @@ namespace TickZoom.Api
             return obj;
 		}
 		
+		private string GetExecutablePath() {
+			return Path.GetDirectoryName( Assembly.GetExecutingAssembly().CodeBase).Replace(@"file:\","");
+		}
+		
 		private string GetShadowCopyFolder() {
-			return System.Environment.CurrentDirectory+
-				Path.DirectorySeparatorChar+
-				"ShadowCopy"+
+			return GetExecutablePath() + Path.DirectorySeparatorChar + "ShadowCopy"+
 				Path.DirectorySeparatorChar+
 				System.Diagnostics.Process.GetCurrentProcess().ProcessName +
 				Path.DirectorySeparatorChar;
@@ -154,10 +161,11 @@ namespace TickZoom.Api
 					}
 					
 					// Create shadow copy.
+					LogMsg("Creating shadow copy for loading...");
 					string fileName = Path.GetFileName(fullPath);
 					string fileDirectory = Path.GetDirectoryName(fullPath);
 					string loadPath = fullPath;
-					if( fileDirectory != System.Environment.CurrentDirectory) {
+					if( fileDirectory != GetExecutablePath()) {
 						try {
 							string shadowPath = GetShadowCopyFolder() + fileName;
 							File.Copy(fullPath,shadowPath,true);

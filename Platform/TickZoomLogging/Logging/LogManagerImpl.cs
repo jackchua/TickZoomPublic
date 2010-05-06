@@ -42,9 +42,10 @@ namespace TickZoom.Logging
 		Dictionary<string,LogImpl> map = new Dictionary<string,LogImpl>();
 		public void Configure() {
 			AppDomain domain = AppDomain.CurrentDomain;
-			Console.WriteLine(domain.FriendlyName+": TickZoom.Logging.LogManagerImpl: Configuring log4net");
 			log4net.Config.XmlConfigurator.Configure();
 		}
+		
+		
 		public string LogFolder {
 			get {
                 // get the log directory

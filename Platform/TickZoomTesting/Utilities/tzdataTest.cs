@@ -27,8 +27,10 @@
 
 using System;
 using System.Configuration;
-using NUnit.Framework;
 using System.IO;
+
+using Microsoft.Win32;
+using NUnit.Framework;
 using TickZoom.Api;
 using tzdata;
 
@@ -71,6 +73,49 @@ namespace TickZoom.Utilities
 			Assert.IsTrue( File.Exists( origFile));
 			Assert.IsTrue( File.Exists( backupFile));
 			Assert.IsFalse( File.Exists( tempFile));
+		}
+		
+		[Test]
+		public void TestQuery()
+		{
+			string[] args = { @"C:\TickZoom\DataCache\ESH0_Tick.tck" };
+			Query query = new Query(args);
+			string expectedOutput = @"Symbol: /ESH0
+Ticks: 15683
+Trade Only: 15683
+From: 2010-02-16 16:49:28.769
+To: 2010-02-16 16:59:56.140
+Prices duplicates: 14489
+";
+			string output = query.ToString();
+			Assert.AreEqual(expectedOutput,output);			
+		}
+		
+		[Test]
+		public void TestRegister()
+		{
+	       	Register register = new Register(null);
+
+	       	string expectedExtension = ".tck";
+	       	string expectedProgId = "TZData";
+	       	string expectedDescription = "TickZoom Tick Data";
+	       	string expectedExecutable = "tzdata.exe\" \"open\" \"%1\"";
+	        using (RegistryKey extKey = Registry.ClassesRoot.OpenSubKey(expectedExtension, true))
+	        {
+	        	Assert.AreEqual(expectedProgId,extKey.GetValue(string.Empty));
+	        }
+			
+	        using (RegistryKey progIdKey = Registry.ClassesRoot.OpenSubKey(expectedProgId,true))
+	        {
+	        	object description = progIdKey.GetValue(string.Empty);
+	        	Assert.AreEqual(expectedDescription,description);
+				
+	            using (RegistryKey command = progIdKey.OpenSubKey("shell\\open\\command",true))
+	            {
+	            	string executable = (string) command.GetValue(string.Empty);
+	            	Assert.IsTrue(executable.Contains(expectedExecutable),executable + " contains " + expectedExecutable);
+	            }
+	        }
 		}
 	}
 }

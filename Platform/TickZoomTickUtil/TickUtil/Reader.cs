@@ -98,7 +98,6 @@ namespace TickZoom.TickUtil
 			}
 		}
 		
-		[Obsolete("Use Initialize( folderOrfile, symbol) instead.",true)]
 		public void Initialize(string fileName) {
 			this.fileName = fileName;
 			if(debug) log.Debug("File Name = " + fileName);

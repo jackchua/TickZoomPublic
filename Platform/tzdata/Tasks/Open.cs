@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -25,42 +25,23 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Reflection;
+
 using TickZoom.Api;
 
-namespace TickZoom.Common
+namespace tzdata
 {
-
-	/// <summary>
-	/// Description of SymbolFactory.
-	/// </summary>
-	public class SymbolFactoryImpl : SymbolFactory
-	{
-		SymbolLibrary library;
-		
-		public SymbolLibrary Library {
-			get { 
-				if( library == null) {
-					lock( locker) {
-						library = new SymbolLibrary();
-					}
-				}
-				return library;
+	public class Open {
+		string currentDir = System.Environment.CurrentDirectory;
+		public Open(string[] args) {
+			try { 
+				Console.Write( new Query(args).ToString());
+			} catch( Exception ex) {
+				Console.WriteLine(ex.Message);
 			}
+			Console.Write("Press any key to continue . . . ");
+			Console.ReadKey(true);
 		}
-		object locker = new object();
-		public SymbolFactoryImpl()
-		{
-		}
-		
-		public SymbolInfo LookupSymbol(string symbol)
-		{
-			return Library.LookupSymbol(symbol);
-		}
-		
-		public SymbolInfo LookupSymbol(ulong identifier)
-		{
-			return Library.LookupSymbol(identifier);
-		}
-		
 	}
 }
