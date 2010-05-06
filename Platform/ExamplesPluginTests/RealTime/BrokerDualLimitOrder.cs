@@ -47,6 +47,8 @@ namespace MockProvider
 			SyncTicks.Enabled = true;
 			DeleteFiles();
 			Symbols = "USD/JPY,EUR/USD";
+			MatchTestResultsOf(typeof(DualStrategyLimitOrder));
+			
 //			BreakPoint.SetEngineConstraint();
 //			BreakPoint.SetTickBreakPoint("2009-06-09 10:49:21.502");
 //			BreakPoint.SetBarBreakPoint(15);

@@ -73,7 +73,9 @@
     <Compile Include="Loaders\LimitOrderTest.cs" />
     <Compile Include="Loaders\LimitOrderTickBarTest.cs" />
     <Compile Include="Loaders\MarketOrderTest.cs" />
+    <Compile Include="Loaders\OverlappingSymbolPortfolio.cs" />
     <Compile Include="Loaders\StrategyTest.cs" />
+    <Compile Include="Loaders\TestDualStrategyLoader.cs" />
     <Compile Include="Loaders\TestLimitOrderLoader.cs" />
     <Compile Include="Loaders\TestMarketOrderLoader.cs" />
     <Compile Include="Loaders\TradeOnlyLimitOrderTest.cs" />

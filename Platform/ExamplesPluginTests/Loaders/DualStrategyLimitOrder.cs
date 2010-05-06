@@ -44,9 +44,7 @@ namespace Loaders
 		public DualStrategyLimitOrder() {
 			Symbols = "USD/JPY,EUR/USD";
 			ShowCharts = false;
-			StoreKnownGood = false;
-//			BreakPoint.SetBarBreakPoint(15);
-//			BreakPoint.SetSymbolConstraint("EUR/USD");
+			StoreKnownGood = true;
 		}
 			
 		[TestFixtureSetUp]
@@ -117,6 +115,16 @@ namespace Loaders
 		}
 		
 		[Test]
+		public void VerifyPortfolioBarDataCount() {
+			VerifyBarDataCount(portfolio);
+		}
+		
+		[Test]
+		public void VerifyPortfolioBarData() {
+			VerifyBarData(portfolio);
+		}
+		
+		[Test]
 		public void VerifyStrategy1BarData() {
 			VerifyBarData(strategy1);
 		}
@@ -142,32 +150,5 @@ namespace Loaders
 		}
 	}
 	
-	public class TestDualStrategyLoader : ModelLoaderCommon
-	{
-		public TestDualStrategyLoader() {
-			/// <summary>
-			/// IMPORTANT: You can personalize the name of each model loader.
-			/// </summary>
-			category = "Example";
-			name = "Dual Symbol";
-			this.IsVisibleInGUI = false;
-		}
-		
-		public override void OnInitialize(ProjectProperties properties) {
-		}
-		
-		public override void OnLoad(ProjectProperties properties) {
-			properties.Engine.RealtimeOutput = false;
-			Portfolio portfolio = CreatePortfolio("Portfolio","EntirePortfolio");
-			foreach( var symbol in properties. Starter.SymbolProperties) {
-				string name = "ExampleOrderStrategy+" + symbol.Symbol;
-				ExampleOrderStrategy strategy = (ExampleOrderStrategy) CreateStrategy("ExampleOrderStrategy",name);
-				strategy.Multiplier = 10D;
-				strategy.SymbolDefault = symbol.Symbol;
-//				portfolio.Performance.Equity.StartingEquity = 100000;
-				AddDependency(portfolio,strategy);
-			}
-			TopModel = portfolio;
-		}
-	}
+
 }
