@@ -213,7 +213,7 @@ namespace TickZoom.Common
 
 		private void ModifyPosition( double position, double price, TimeStamp time, LogicalOrder order) {
 			CreateLogicalFillHelper(position, price, time, order);
-			TryDrawTrade(order, price, position);
+//			TryDrawTrade(order, price, position);
 			CancelEnterOrders();
 		}
 		
@@ -254,7 +254,7 @@ namespace TickZoom.Common
 			LogMsg("Buy Market Exit at " + tick);
 			double price = tick.IsTrade ? tick.Price : tick.Ask;
 			FlattenPosition(price, tick, order);
-			TryDrawTrade(order, price, position);
+//			TryDrawTrade(order, price, position);
 		}
 		
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
@@ -262,7 +262,7 @@ namespace TickZoom.Common
 			LogMsg("Sell Market Exit at " + tick);
 			double price = tick.IsTrade ? tick.Price : tick.Bid;
 			FlattenPosition(price, tick, order);
-			TryDrawTrade(order, price, position);
+//			TryDrawTrade(order, price, position);
 		}
 
 		private void ProcessBuyStop(LogicalOrder order, Tick tick)
@@ -271,7 +271,7 @@ namespace TickZoom.Common
 			if (price >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
 				FlattenPosition(price, tick, order);
-				TryDrawTrade(order, price, position);
+//				TryDrawTrade(order, price, position);
 			}
 		}
 
@@ -288,7 +288,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Buy Limit Exit at " + tick);
 				FlattenPosition(price, tick, order);
-				TryDrawTrade(order, price, position);
+//				TryDrawTrade(order, price, position);
 			}
 		}
 
@@ -298,7 +298,7 @@ namespace TickZoom.Common
 			if (price <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
 				FlattenPosition(price, tick, order);
-				TryDrawTrade(order, price, position);
+//				TryDrawTrade(order, price, position);
 			}
 		}
 
@@ -315,7 +315,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Sell Stop Limit at " + tick);
 				FlattenPosition(price, tick, order);
-				TryDrawTrade(order, price, position);
+//				TryDrawTrade(order, price, position);
 			}
 		}
 
@@ -424,7 +424,7 @@ namespace TickZoom.Common
 				LogMsg("Long Stop Entry at " + tick);
 				
 				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-				TryDrawTrade(order, price, order.Positions);
+//				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -435,7 +435,7 @@ namespace TickZoom.Common
 			if (price <= order.Price) {
 				LogMsg("Short Stop Entry at " + tick);
 				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-				TryDrawTrade(order, price, order.Positions);
+//				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -449,7 +449,7 @@ namespace TickZoom.Common
 			LogMsg("Long Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
 			CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-			TryDrawTrade(order, price, order.Positions);
+//			TryDrawTrade(order, price, order.Positions);
 			CancelEnterOrders();
 		}
 
@@ -481,7 +481,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Long Limit Entry at " + tick);
 				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
-				TryDrawTrade(order, price, order.Positions);
+//				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -491,7 +491,7 @@ namespace TickZoom.Common
 			LogMsg("Short Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Bid : tick.Price;
 			CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
-			TryDrawTrade(order, price, -order.Positions);
+//			TryDrawTrade(order, price, -order.Positions);
 			CancelEnterOrders();
 		}
 
@@ -508,7 +508,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Short Limit Entry at " + tick);
 				CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
-				TryDrawTrade(order, price, -order.Positions);
+//				TryDrawTrade(order, price, -order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -525,11 +525,15 @@ namespace TickZoom.Common
 				if( order.Id == orderId) {
 					if( IsDebug) Log.Debug( "Matched fill with orderId: " + orderId);
 					if( order.TradeDirection == TradeDirection.Entry && !doEntryOrders) {
-						if( IsDebug) Log.Debug( "Skipping fill, entry orders fills disabled.");
+						if( IsDebug) Log.Debug( "Skipping fill, entry order fills disabled.");
 						return;
 					}
 					if( order.TradeDirection == TradeDirection.Exit && !doExitOrders) {
-						if( IsDebug) Log.Debug( "Skipping fill, exit orders fills disabled.");
+						if( IsDebug) Log.Debug( "Skipping fill, exit order fills disabled.");
+						return;
+					}
+					if( order.TradeDirection == TradeDirection.Reverse && !doExitOrders) {
+						if( IsDebug) Log.Debug( "Skipping fill, reverse order fills disabled.");
 						return;
 					}
 					if( order.TradeDirection == TradeDirection.ExitStrategy && !doExitStrategyOrders) {
