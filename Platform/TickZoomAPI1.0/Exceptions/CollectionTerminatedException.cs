@@ -33,7 +33,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of Class1.
 	/// </summary>
-	[Serializable()]
+	[Serializable]
 	public class CollectionTerminatedException : System.ApplicationException
 	{
 	    public CollectionTerminatedException() { }

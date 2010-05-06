@@ -132,7 +132,7 @@ namespace MiscTest
 		 			File.Delete( appData + @"\TestServerCache\IBM_Tick.tck");
 		 			File.Delete( appData + @"\TestServerCache\GBPUSD_Tick.tck");
 					return;
-				} catch( Exception ex) {
+				} catch( Exception) {
 					count ++;
 					if( count > 100) {
 						throw;

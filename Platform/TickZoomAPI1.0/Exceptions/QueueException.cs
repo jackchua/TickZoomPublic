@@ -31,7 +31,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of Class1.
 	/// </summary>
-	[Serializable()]
+	[Serializable]
 	public class QueueException : System.ApplicationException
 	{
 		private EventType queueItemType;

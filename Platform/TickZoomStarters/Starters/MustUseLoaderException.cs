@@ -31,7 +31,7 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of Class1.
 	/// </summary>
-	[Serializable()]
+	[Serializable]
 	public class MustUseLoaderException : System.ApplicationException
 	{
 	    public MustUseLoaderException() { }

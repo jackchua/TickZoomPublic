@@ -32,7 +32,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of Class1.
 	/// </summary>
-	[Serializable()]
+	[Serializable]
 	public class SocketErrorException : System.ApplicationException
 	{
 		SocketError socketError;
