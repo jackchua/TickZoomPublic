@@ -44,7 +44,7 @@ namespace Loaders
 		public DualStrategyLimitOrder() {
 			Symbols = "USD/JPY,EUR/USD";
 			ShowCharts = false;
-			StoreKnownGood = true;
+			StoreKnownGood = false;
 		}
 			
 		[TestFixtureSetUp]

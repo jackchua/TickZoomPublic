@@ -234,8 +234,7 @@ namespace TickZoom.Common
 			} else {
 				throw new ApplicationException("PortfolioType was never set.");
 			}
-		}
-		
+		}		
 		
 		/// <summary>
 		/// Shortcut to look at the data of and control any dependant strategies.
