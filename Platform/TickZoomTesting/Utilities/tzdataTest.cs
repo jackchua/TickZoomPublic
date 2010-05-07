@@ -78,7 +78,7 @@ namespace TickZoom.Utilities
 		[Test]
 		public void TestQuery()
 		{
-			string[] args = { @"C:\TickZoom\DataCache\ESH0_Tick.tck" };
+			string[] args = { @"C:\TickZoom\TestData\ESH0_Tick.tck" };
 			Query query = new Query(args);
 			string expectedOutput = @"Symbol: /ESH0
 Ticks: 15683
