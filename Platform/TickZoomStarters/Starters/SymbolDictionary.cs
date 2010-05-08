@@ -423,6 +423,7 @@ namespace TickZoom.Common
         <property name=""UseSyntheticMarkets"" value=""false"" />
       </symbol>
       <symbol name=""/ESZ9"" />
+      <symbol name=""TestException"" />
       <category name=""TradeOnly"">
         <property name=""TimeAndSales"" value=""ActualTrades"" />
         <property name=""QuoteType"" value=""None"" />

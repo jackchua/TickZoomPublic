@@ -83,6 +83,9 @@ namespace TickZoom.Common
 			int startTime = Environment.TickCount;
 			count = 0;
 			while (Environment.TickCount - startTime < timeout * 1000) {
+				if( propagateException != null) {
+					throw propagateException;
+				}
 				try { 
 					if( tickQueue.TryDequeue(ref tickBinary)) {
 						tickIO.Inject(tickBinary);
@@ -119,6 +122,9 @@ namespace TickZoom.Common
 			count = 0;
 			TickBinary binary = new TickBinary();
 			while (Environment.TickCount - startTime < timeout * 1000) {
+				if( propagateException != null) {
+					throw propagateException;
+				}
 				try { 
 					if( !tickQueue.TryDequeue(ref binary)) {
 						Thread.Sleep(100);
@@ -141,6 +147,9 @@ namespace TickZoom.Common
 			int startTime = Environment.TickCount;
 			count = 0;
 			while (Environment.TickCount - startTime < timeout * 1000) {
+				if( propagateException != null) {
+					throw propagateException;
+				}
 				try {
 					// Remove ticks just so as to get to the event we want to see.
 					if( tickQueue.TryDequeue(ref tickBinary)) {
@@ -174,6 +183,9 @@ namespace TickZoom.Common
 			double position;
 			TickBinary binary = new TickBinary();
 			while (Environment.TickCount - startTime < timeout * 1000) {
+				if( propagateException != null) {
+					throw propagateException;
+				}
 				try { 
 					if( !tickQueue.TryDequeue(ref binary)) {
 						Thread.Sleep(10);
@@ -245,6 +257,9 @@ namespace TickZoom.Common
 		{
 			int end = startTime + timeoutSeconds * 1000;
 			while( count < expectedTickCount && Environment.TickCount < end) {
+				if( propagateException != null) {
+					throw propagateException;
+				}
 				Thread.Sleep(100);
 			}
 			log.Notice("Last tick received: " + tickIO.ToPosition());
@@ -343,10 +358,9 @@ namespace TickZoom.Common
 			return true;
 		}
 
-		public bool OnError(string error)
+		public bool OnError(ErrorDetail error)
 		{
-			log.Error(error);
-			Dispose();
+			OnException( new Exception(error.ErrorMessage));
 			return true;
 		}
 		
@@ -433,7 +447,7 @@ namespace TickZoom.Common
 						result = OnEndRealTime(symbol);
 						break;
 					case EventType.Error:
-						result = OnError((string)eventDetail);
+						result = OnError((ErrorDetail)eventDetail);
 						break;
 					case EventType.LogicalFill:
 						result = OnPositionChange(symbol,(LogicalFillBinary)eventDetail);

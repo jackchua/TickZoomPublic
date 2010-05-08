@@ -60,6 +60,9 @@ namespace TickZoom.Test
             int startTime = Environment.TickCount;
             count = 0;
 			while( Environment.TickCount - startTime < timeout * 1000 ) {
+            	if( propagateException != null) {
+            		throw propagateException;
+            	}
     			if( HandleTick(expectedCount, assertTick,symbol)) {
     				break;
     			}
@@ -70,6 +73,9 @@ namespace TickZoom.Test
 		private bool HandleTick(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol) {
 			try { 
     			while( !tickQueue.TryDequeue(ref tickBinary)) {
+	            	if( propagateException != null) {
+	            		throw propagateException;
+	            	}
     				Thread.Sleep(1);
     			}
             	tick.Inject(tickBinary);
@@ -84,6 +90,9 @@ namespace TickZoom.Test
             		assertTick(tick,lastTick,symbol.BinaryIdentifier);
             	}
             	lastTick.Copy(tick);
+            	if( propagateException != null) {
+            		throw propagateException;
+            	}
             	if( count >= expectedCount) return true;
 			} catch( QueueException ex) {
 				switch( ex.EntryType) {
@@ -107,11 +116,19 @@ namespace TickZoom.Test
             startTime = Environment.TickCount;
            	count = 0;
            	countLog = 0;
-           	task = Factory.Parallel.Loop(this,TimeTheFeedTask);
+           	task = Factory.Parallel.Loop(this,OnException,TimeTheFeedTask);
         }
+       	
+       	private Exception propagateException = null;
+       	private void OnException( Exception ex) {
+       		propagateException = ex;	
+       	}
            	
         public int EndTimeTheFeed() {
   			task.Join();
+        	if( propagateException != null) {
+        		throw propagateException;
+        	}
             int endTime = Environment.TickCount;
             int elapsed = endTime - startTime;
             log.Notice("Processed " + count + " ticks in " + elapsed + "ms or " + (count*1000/elapsed) + "ticks/sec");
@@ -191,7 +208,6 @@ namespace TickZoom.Test
 		public bool OnEndHistorical(SymbolInfo symbol)
 		{
 			return tickQueue.TryEnQueue(EventType.EndHistorical, symbol);
-			return true;
 		}
 		
 		public bool OnEndRealTime(SymbolInfo symbol)
