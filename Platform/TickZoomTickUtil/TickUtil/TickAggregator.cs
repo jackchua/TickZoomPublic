@@ -71,10 +71,18 @@ namespace TickZoom.TickUtil
 				if( debug) log.Debug("Start");
 				this.receiver = receiver;
 		        isStarted = true;
-		        runTask = Factory.Parallel.Loop(tick,Process);
+		        runTask = Factory.Parallel.Loop(tick,OnException,Process);
 			}
 		}
 		
+        private void OnException( Exception ex) {
+	    	ErrorDetail detail = new ErrorDetail();
+	    	detail.ErrorMessage = ex.ToString();
+			while( !receiver.OnEvent(null,(int)EventType.Error,detail)) {
+        		Factory.Parallel.Yield();
+			}
+        }
+        
 		bool isProcessStarted = false;
 
 		TickBinary tick = new TickBinary();

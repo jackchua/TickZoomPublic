@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,8 +28,7 @@ using System;
 
 namespace TickZoom.Api
 {
-
-	public class TimeSyncDetail {
-		public TickBinary Tick;
+	public class ErrorDetail {
+		public string ErrorMessage;
 	}
 }

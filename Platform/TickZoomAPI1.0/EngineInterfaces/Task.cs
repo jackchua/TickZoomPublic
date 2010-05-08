@@ -33,7 +33,6 @@ namespace TickZoom.Api
 		void Join();
 		void Pause();
 		void Resume();
-		void Catch();
 		/// <summary>
 		/// Briefly boost priority. Usefulf for a dependendant
 		/// task that is blocked to prod the higher task to clean

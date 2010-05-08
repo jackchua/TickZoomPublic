@@ -232,7 +232,13 @@ namespace TickZoom.Common
 			startTime = Environment.TickCount;
 			count = 0;
 			countLog = 0;
-			task = Factory.Parallel.Loop(this, TimeTheFeedTask);
+			task = Factory.Parallel.Loop(this, OnException, TimeTheFeedTask);
+		}
+		
+		private Exception propagateException = null;
+		
+		private void OnException( Exception ex) {
+			propagateException = ex;	
 		}
 
 		public int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds)
@@ -244,6 +250,9 @@ namespace TickZoom.Common
 			log.Notice("Last tick received: " + tickIO.ToPosition());
 			Factory.TickUtil.TickQueue("Stats").LogStats();
 			Dispose();
+			if( propagateException != null) {
+				throw propagateException;
+			}
 			return count;
 		}
 

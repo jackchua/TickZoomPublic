@@ -54,8 +54,8 @@ namespace TickZoom.TickUtil
 	    public bool TryEnQueue(ref TickBinary o)
 	    {
         	QueueItem item = new QueueItem();
-    		item.EventType = 0;
-    		item.Tick = o;
+        	item.EventType = (int) EventType.Tick;
+    		item.EventDetail = o;
     		return TryEnQueueStruct(ref item);
 	    }
 	    
@@ -71,7 +71,7 @@ namespace TickZoom.TickUtil
         	QueueItem item = new QueueItem();
 	    	item.EventType = (int) entryType;
 	    	if( symbol != null) {
-	    		item.EventChange.Symbol = symbol.BinaryIdentifier;
+	    		item.Symbol = symbol.BinaryIdentifier;
 	    	}
 	    	return TryEnQueueStruct(ref item);
 	    }
@@ -102,16 +102,16 @@ namespace TickZoom.TickUtil
         	QueueItem item = new QueueItem();
 	    	bool result = TryDequeueStruct(ref item);
 	    	if( result) {
-		    	if( item.EventType != 0) {
+	    		if( item.EventType != (int) EventType.Tick) {
 		    		string symbol;
-		    		if( item.Tick.Symbol != 0) {
-		    			symbol = item.Tick.Symbol.ToSymbol();
+		    		if( item.Symbol != 0) {
+		    			symbol = item.Symbol.ToSymbol();
 		    		} else {
 		    			symbol = "";
 		    		}
 		    		throw new QueueException( (EventType) item.EventType, symbol);
 		    	} else {
-		    		tick = item.Tick;
+	    			tick = (TickBinary) item.EventDetail;
 		    	}
 	    	}
 	    	return result;

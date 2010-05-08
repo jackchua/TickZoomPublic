@@ -134,8 +134,14 @@ namespace TickZoom.TickUtil
 		    this.receiver = receiver;
 			if(debug) log.Debug("Start called.");
 			StartupTask();
-			fileReaderTask = Factory.Parallel.IO.Loop(this,FileReader);
+			fileReaderTask = Factory.Parallel.IO.Loop(this,OnException,FileReader);
 		}
+        
+        private void OnException( Exception ex) {
+			while( !receiver.OnEvent(null,(int)EventType.Error,ex)) {
+        		Factory.Parallel.Yield();
+			}
+        }
         
         public void Stop(Receiver receiver)
         {

@@ -29,15 +29,10 @@ using System.Runtime.InteropServices;
 
 namespace TickZoom.Api
 {
-    [StructLayout(LayoutKind.Explicit)]
 	public struct QueueItem {
-	    [FieldOffset(0)] public int EventType;
-	    [FieldOffset(4)] public TickBinary Tick;
-	    [FieldOffset(4)] public PositionChange PositionChange;
-	    [FieldOffset(4)] public OnPositionChange OnPositionChange;
-	    [FieldOffset(4)] public CustomEvent CustomEvent;
-	    [FieldOffset(4)] public PositionChange EventChange;
-	    [FieldOffset(4)] public ErrorEvent ErrorEvent;
+	    public int EventType;
+	    public ulong Symbol;
+	    public object EventDetail;
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -89,7 +84,7 @@ namespace TickZoom.Api
     
     public struct ErrorEvent
     {
-//        public string Message;
+        public string Message;
     }
     
     public struct EventChange

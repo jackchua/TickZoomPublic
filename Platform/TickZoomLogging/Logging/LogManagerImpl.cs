@@ -39,13 +39,25 @@ using log4net.Filter;
 namespace TickZoom.Logging
 {
 	public class LogManagerImpl : LogManager {
+		private static Log exceptionLog;
+		private static object locker = new object();
 		Dictionary<string,LogImpl> map = new Dictionary<string,LogImpl>();
 		public void Configure() {
-			AppDomain domain = AppDomain.CurrentDomain;
 			log4net.Config.XmlConfigurator.Configure();
+			lock( locker) {
+				if( exceptionLog == null) {
+					exceptionLog = GetLogger("TickZoom.AppDomain");
+				    AppDomain.CurrentDomain.UnhandledException +=
+				        new UnhandledExceptionEventHandler(UnhandledException);
+				}
+			}
 		}
 		
-		
+		private static void UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+		    Exception ex = (Exception)e.ExceptionObject;
+		    exceptionLog.Error("Unhandled exception caught",ex);
+		}
+	
 		public string LogFolder {
 			get {
                 // get the log directory
