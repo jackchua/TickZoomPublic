@@ -37,7 +37,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Submits post data to a url.
 	/// </summary>
-	internal class PostSubmitter
+	public class PostSubmitter
 	{
 		string downloadDirectory = Factory.Settings["AppDataFolder"];
 		string contentDisposition;
@@ -108,7 +108,7 @@ namespace TickZoom.Api
 		/// <summary>
 		/// Default constructor.
 		/// </summary>
-		internal PostSubmitter()
+		public PostSubmitter()
 		{
 		}
 		
@@ -134,7 +134,7 @@ namespace TickZoom.Api
 		/// <summary>
 		/// Gets or sets the url to submit the post to.
 		/// </summary>
-		internal string Url
+		public string Url
 		{
 			get
 				{
@@ -148,7 +148,7 @@ namespace TickZoom.Api
 		/// <summary>
 		/// Gets or sets the name value collection of items to post.
 		/// </summary>
-		internal NameValueCollection PostItems
+		public NameValueCollection PostItems
 		{
 			get
 			{
@@ -177,7 +177,7 @@ namespace TickZoom.Api
 		/// Posts the supplied data to specified url.
 		/// </summary>
 		/// <returns>a string containing the result of the post.</returns>
-		internal string Post()
+		public string Post()
 		{
 			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 			this.m_type=PostSubmitter.PostTypeEnum.Post;

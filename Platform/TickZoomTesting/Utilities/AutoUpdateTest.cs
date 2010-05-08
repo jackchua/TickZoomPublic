@@ -26,10 +26,7 @@
 
 
 using System;
-using System.Configuration;
 using System.IO;
-using System.Reflection;
-
 using NUnit.Framework;
 using TickZoom.Api;
 
@@ -68,6 +65,7 @@ namespace TickZoom.Utilities
 			Assert.IsFalse(retVal,"did download");
 			Assert.AreEqual("Your user key was not found. Please verify that you have a valid key.\n", updater.Message);
 		}
+		
 		[Test]
 		public void TestBadFile()
 		{
