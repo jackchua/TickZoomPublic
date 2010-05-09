@@ -154,7 +154,7 @@ namespace TickZoom.Test
 			using( Provider provider = CreateProvider(true)) {
 				provider.SendEvent(verify,null,(int)EventType.Connect,null);
 				provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
-		  		long count = verify.Verify(2,assertTick,symbol,25);
+		  		long count = verify.Verify(2,assertTick,symbol,120);
 	  			Assert.GreaterOrEqual(count,2,"tick count");
 	  			provider.SendEvent(verify,null,(int)EventType.Terminate,null);
 	  			

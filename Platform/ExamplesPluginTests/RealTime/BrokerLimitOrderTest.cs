@@ -47,12 +47,13 @@ namespace MockProvider
 			SyncTicks.Enabled = true;
 			ShowCharts = false;
 			StoreKnownGood = false;
+			CreateStarterCallback = CreateStarter;
 			DeleteFiles();
 			Symbols = "USD/JPY";
 			
 		}
 		
-		public override Starter CreateStarter()
+		public Starter CreateStarter()
 		{
 			return new RealTimeStarter();
 		}

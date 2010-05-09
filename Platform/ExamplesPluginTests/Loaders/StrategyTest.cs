@@ -40,6 +40,8 @@ using ZedGraph;
 
 namespace Loaders
 {
+	public delegate Starter CreateStarterCallback();
+	
 	public class StrategyTest
 	{
 		static readonly Log log = Factory.Log.GetLogger(typeof(StrategyTest));
@@ -57,9 +59,11 @@ namespace Loaders
 		Dictionary<string,List<TradeInfo>> testTradeMap = new Dictionary<string,List<TradeInfo>>();
 		public bool ShowCharts = false;
 		public bool StoreKnownGood = false;
+		public CreateStarterCallback createStarterCallback;
 		
 		public StrategyTest() {
  			testFileName = GetType().Name;
+			createStarterCallback = CreateStarter;
 		}
 		
 		public void MatchTestResultsOf( Type type) {
@@ -109,7 +113,7 @@ namespace Loaders
 			public double CurrentEquity;
 		}
 		
-		public virtual Starter CreateStarter() {
+		private Starter CreateStarter() {
 			return new HistoricalStarter();			
 		}
 		
@@ -474,5 +478,9 @@ namespace Loaders
 			set { symbols = value; }
 		}
 		
+		public CreateStarterCallback CreateStarterCallback {
+			get { return createStarterCallback; }
+			set { createStarterCallback = value; }
+		}
 	}
 }

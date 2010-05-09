@@ -38,6 +38,12 @@ namespace TickZoom.TickUtil
 		}
 	}
 	
+	public class FastEventQueueImpl : FastQueueImpl<QueueItem>, FastEventQueue {
+		public FastEventQueueImpl(string name, int maxSize) : base(name, maxSize) {
+			
+		}
+	}
+	
 	public class FastQueueImpl<T> : FastQueue<T> // where T : struct
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(FastQueueImpl<T>));

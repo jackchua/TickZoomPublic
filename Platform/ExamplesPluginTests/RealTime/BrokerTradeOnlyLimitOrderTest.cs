@@ -45,12 +45,13 @@ namespace MockProvider
 			SyncTicks.Enabled = true;
 			ShowCharts = false;
 			StoreKnownGood = false;
+			CreateStarterCallback = CreateStarter;
 			DeleteFiles();
 			Symbols = "/ESH0TradeBar";
 			MatchTestResultsOf(typeof(TradeOnlyLimitOrderTest));
 		}
 		
-		public override Starter CreateStarter()
+		public Starter CreateStarter()
 		{
 			return new RealTimeStarter();
 		}

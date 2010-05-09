@@ -46,6 +46,7 @@ namespace MockProvider
 			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			SyncTicks.Enabled = true;
 			DeleteFiles();
+			CreateStarterCallback = CreateStarter;
 			Symbols = "USD/JPY,EUR/USD";
 			MatchTestResultsOf(typeof(DualStrategyLimitOrder));
 			
@@ -57,7 +58,7 @@ namespace MockProvider
 			StoreKnownGood = false;
 		}
 		
-		public override Starter CreateStarter()
+		public Starter CreateStarter()
 		{
 			return new RealTimeStarter();
 		}

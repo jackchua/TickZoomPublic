@@ -46,8 +46,12 @@ namespace TickZoom.TickUtil
 			return new TickQueueImpl(name);
 		}
 		
-		public FastFillQueue FastItemQueue(string name, int maxSize) {
+		public FastFillQueue FastFillQueue(string name, int maxSize) {
 			return new FastFillQueueImpl(name,maxSize);
+		}
+		
+		public FastEventQueue FastEventQueue(string name, int maxSize) {
+			return new FastEventQueueImpl(name,maxSize);
 		}
 		
 		public TickWriter TickWriter(bool overwriteFile) {

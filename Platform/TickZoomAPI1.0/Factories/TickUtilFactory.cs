@@ -37,7 +37,8 @@ namespace TickZoom.Api
 		TickQueue TickQueue( Type type);
 		TickQueue TickQueue( string name);
 		TickIO TickIO();
-		FastFillQueue FastItemQueue(string name, int maxSize);
+		FastFillQueue FastFillQueue(string name, int maxSize);
+		FastEventQueue FastEventQueue(string name, int maxSize);
 		TickWriter TickWriter(bool overwriteFile);
 	}
 }

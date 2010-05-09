@@ -54,9 +54,11 @@ namespace TickZoom.Common
 			ServiceConnection service = Factory.Provider.ProviderService();
 			service.OnStart();
 			runMode = RunMode.RealTime;
-			base.Run(model);
-			
-			service.OnStop();
+			try {
+				base.Run(model);
+			} finally {
+				service.OnStop();
+			}
 		}
 	}
 }

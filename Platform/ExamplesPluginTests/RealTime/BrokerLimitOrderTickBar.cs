@@ -45,6 +45,7 @@ namespace MockProvider
 			SyncTicks.Enabled = true;
 			ShowCharts = false;
 			StoreKnownGood = false;
+			CreateStarterCallback = CreateStarter;
 			DeleteFiles();
 			Symbols = "USD/JPY";
 			MatchTestResultsOf(typeof(LimitOrderTickBarTest));
@@ -55,7 +56,7 @@ namespace MockProvider
 //			BreakPoint.SetSymbolConstraint("EUR/USD");
 		}
 		
-		public override Starter CreateStarter()
+		public Starter CreateStarter()
 		{
 			return new RealTimeStarter();
 		}

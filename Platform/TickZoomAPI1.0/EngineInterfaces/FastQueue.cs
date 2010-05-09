@@ -47,8 +47,6 @@ namespace TickZoom.Api
 		void Pause();
 		void Resume();
 		void LogStatistics();
-//		bool CanEnqueue { get; }
-//		bool CanDequeue { get; }
 		int Count { get; }
 		long EnqueueConflicts { get; }
 		long DequeueConflicts { get; }

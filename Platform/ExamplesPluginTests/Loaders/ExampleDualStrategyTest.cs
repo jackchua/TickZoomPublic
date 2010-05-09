@@ -51,7 +51,7 @@ namespace Loaders
 		public override void RunStrategy() {
 			base.RunStrategy();
 			try {
-				Starter starter = CreateStarter();
+				Starter starter = CreateStarterCallback();
 				
 				// Set run properties as in the GUI.
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);

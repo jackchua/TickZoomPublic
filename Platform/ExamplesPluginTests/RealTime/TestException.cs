@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -37,23 +37,29 @@ using ZedGraph;
 
 namespace MockProvider
 {
-
 	[TestFixture]
-	public class BrokerMarketOrder : MarketOrderTest {
+	public class TestException {
 		
-		public BrokerMarketOrder() {
+		public TestException() {
 			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			SyncTicks.Enabled = true;
 			DeleteFiles();
-			Symbols = "USD/JPY";
-			CreateStarterCallback = CreateStarter;
-//			BreakPoint.SetEngineConstraint();
-//			BreakPoint.SetTickBreakPoint("2009-06-09 10:49:21.502");
-//			BreakPoint.SetBarBreakPoint(15);
-//			BreakPoint.SetSymbolConstraint("EUR/USD");
-			MatchTestResultsOf(typeof(MarketOrderTest));
-			ShowCharts = false;
-			StoreKnownGood = false;
+		}
+		
+		[Test]
+		public void RunStrategy()
+		{
+			try {
+				MarketOrderTest testFixture = new MarketOrderTest();
+				testFixture.Symbols = "TestException";
+				testFixture.CreateStarterCallback = CreateStarter;
+				testFixture.RunStrategy();
+	    		Assert.Fail("Expected exception of propagation of exception never thrown.");
+	
+			} catch( Exception ex) {
+				string expectedMessage = @"System.InvalidOperationException: Test of Exception Propagation";
+				Assert.IsTrue(ex.Message.StartsWith(expectedMessage));
+			}
 		}
 		
 		public Starter CreateStarter()
@@ -72,9 +78,5 @@ namespace MockProvider
 			}
 		}
 		
-		[Test]
-		public void CheckMockTradeCount() {
-			Assert.AreEqual(207,SyncTicks.MockTradeCount);
-		}
 	}
 }
